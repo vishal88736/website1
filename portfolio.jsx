@@ -1074,6 +1074,15 @@ export default function Portfolio() {
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
+html, body, #root {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  background-color: #09090b !important;
+  overflow-x: hidden;
+}
+
 /* -------- COLOR SYSTEM TOKENS -------- */
 .portfolio-root {
   --bg: #09090b;
