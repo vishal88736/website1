@@ -211,9 +211,10 @@ const JOURNEY_MILESTONES = [
 
 const SOCIAL_LINKS = {
   github: "https://github.com/vishal88736",
-  linkedin: "https://linkedin.com/in/vishal-agrawal",
-  twitter: "https://x.com/vishal_agrawal",
-  email: "mailto:vishalagrawal8736@gmail.com"
+  linkedin: "https://www.linkedin.com/in/vishal-agrawal-1ba44532b/",
+  twitter: "https://x.com/vishal__0604",
+  email: "mailto:agrawalvishal804@gmail.com",
+  resume: "https://drive.google.com/file/d/1cRQsrwSxCf0lg_XXxF1i7ahrhkEpK7yd/view?usp=drive_link"
 };
 
 const PALETTE_COMMANDS = [
@@ -226,7 +227,8 @@ const PALETTE_COMMANDS = [
   { id: "upcoming", label: "Upcoming Projects", category: "Navigation", hint: "Cryptrix & NovaTune in active R&D" },
   { id: "journey", label: "Milestones & Journey", category: "Navigation", hint: "AWS Fellow, IIIT Naya Raipur" },
   { id: "contact", label: "Contact & Inquiries", category: "Navigation", hint: "Send a direct message" },
-  { id: "action-copy-email", label: "Copy Email Address", category: "Actions", hint: "vishalagrawal8736@gmail.com", action: "copy-email" },
+  { id: "action-copy-email", label: "Copy Email Address", category: "Actions", hint: "agrawalvishal804@gmail.com", action: "copy-email" },
+  { id: "action-resume", label: "Open Resume (Google Drive)", category: "External", hint: "View PDF Resume", action: "open-resume" },
   { id: "action-toggle-theme", label: "Toggle Theme (Dark / Light)", category: "Actions", hint: "Switch visual theme", action: "toggle-theme" },
   { id: "action-github", label: "Open GitHub Profile", category: "External", hint: "github.com/vishal88736", action: "open-github" }
 ];
@@ -636,8 +638,8 @@ export default function Portfolio() {
   };
 
   const copyEmailToClipboard = () => {
-    navigator.clipboard?.writeText("vishalagrawal8736@gmail.com");
-    triggerToast("Copied vishalagrawal8736@gmail.com to clipboard");
+    navigator.clipboard?.writeText("agrawalvishal804@gmail.com");
+    triggerToast("Copied agrawalvishal804@gmail.com to clipboard");
   };
 
   const scrollToSection = (id) => {
@@ -648,6 +650,8 @@ export default function Portfolio() {
     setPaletteOpen(false);
     if (cmd.action === "copy-email") {
       copyEmailToClipboard();
+    } else if (cmd.action === "open-resume") {
+      window.open(SOCIAL_LINKS.resume, "_blank");
     } else if (cmd.action === "toggle-theme") {
       setTheme((t) => (t === "dark" ? "light" : "dark"));
       triggerToast(`Switched theme to ${theme === "dark" ? "Light Mode" : "Dark Mode"}`);
@@ -663,7 +667,7 @@ export default function Portfolio() {
     const { name, email, message } = contactForm;
     const subject = encodeURIComponent(`Portfolio inquiry from ${name || "Visitor"}`);
     const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
-    window.location.href = `mailto:vishalagrawal8736@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:agrawalvishal804@gmail.com?subject=${subject}&body=${body}`;
     setContactSent(true);
     triggerToast("Opening mail client...");
   };
@@ -729,8 +733,8 @@ export default function Portfolio() {
             >
               {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
             </button>
-            <a href={SOCIAL_LINKS.github} target="_blank" rel="noreferrer" className="btn btn-nav">
-              <Github size={15} /> Resume
+            <a href={SOCIAL_LINKS.resume} target="_blank" rel="noreferrer" className="btn btn-nav">
+              <FileText size={15} /> Resume
             </a>
           </div>
         </div>
@@ -1071,7 +1075,7 @@ export default function Portfolio() {
 
               <div className="contact-details">
                 <button onClick={copyEmailToClipboard} className="contact-detail-item contact-detail-btn">
-                  <Mail size={18} /> vishalagrawal8736@gmail.com <Copy size={14} className="copy-icon" />
+                  <Mail size={18} /> agrawalvishal804@gmail.com <Copy size={14} className="copy-icon" />
                 </button>
                 <div className="contact-detail-item">
                   <Compass size={18} /> IIIT Naya Raipur, India
