@@ -184,28 +184,22 @@ const UPCOMING_PROJECTS = [
 
 const JOURNEY_MILESTONES = [
   {
-    org: "AWS AI for Bharat",
-    role: "AI Fellow",
-    period: "2024 — Present",
-    desc: "Selected for AWS's national AI fellowship program. Shipped production AI systems leveraging AWS Bedrock and SageMaker."
+    org: "AI Durg & Gemma 4 Hackathon",
+    role: "Hackathon Winner — Sanjeevani AI",
+    period: "2024",
+    desc: "Won 1st Place in the hackathon organized by AI Durg & Gemma 4 by engineering 'Sanjeevani' — a multilingual voice-first healthcare triage assistant powered by Gemma LLM."
   },
   {
-    org: "IIIT Naya Raipur",
-    role: "B.Tech, Data Science & Artificial Intelligence",
-    period: "2022 — 2026",
-    desc: "Core coursework in machine learning, deep learning, data structures, and computer vision. Independent research in RAG & multi-agent systems."
+    org: "AWS National Level Hackathon",
+    role: "Prototype Stage Qualifier",
+    period: "2024",
+    desc: "Qualified the prototype level in the AWS National Level Hackathon, gaining deep hands-on expertise in AWS Cloud services, scalable infrastructure, and AI deployment."
   },
   {
     org: "Competitive Programming",
-    role: "CodeChef 2★ · 200+ Problems Solved",
+    role: "CodeChef 2★ · 200+ Problems Solved Across Platforms",
     period: "Ongoing",
-    desc: "Rigorous problem solving across core graph algorithms, dynamic programming, and computational complexity."
-  },
-  {
-    org: "Research & Hackathons",
-    role: "Finalist & Open Source Contributor",
-    period: "Ongoing",
-    desc: "Building open-source developer tooling, multi-agent AI frameworks, and edge vision models."
+    desc: "Achieved CodeChef 2★ rating and solved 200+ algorithmic problems across all competitive coding platforms, mastering graph theory, dynamic programming, and core data structures."
   }
 ];
 
@@ -225,7 +219,7 @@ const PALETTE_COMMANDS = [
   { id: "careertrajectory", label: "CareerTrajectory AI", category: "Flagship Work", hint: "Talent intelligence & candidate evaluation platform" },
   { id: "cottonfield", label: "Cotton Field Analysis", category: "Flagship Work", hint: "Crop health AI from orthomosaic imagery" },
   { id: "upcoming", label: "Upcoming Projects", category: "Navigation", hint: "Cryptrix & NovaTune in active R&D" },
-  { id: "journey", label: "Milestones & Journey", category: "Navigation", hint: "AWS Fellow, IIIT Naya Raipur" },
+  { id: "journey", label: "Milestones & Journey", category: "Navigation", hint: "AI Durg & Gemma Winner, AWS Hackathon, CodeChef 2★" },
   { id: "contact", label: "Contact & Inquiries", category: "Navigation", hint: "Send a direct message" },
   { id: "action-copy-email", label: "Copy Email Address", category: "Actions", hint: "agrawalvishal804@gmail.com", action: "copy-email" },
   { id: "action-resume", label: "Open Resume (Google Drive)", category: "External", hint: "View PDF Resume", action: "open-resume" },
