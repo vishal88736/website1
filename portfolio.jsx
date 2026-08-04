@@ -19,21 +19,30 @@ const ROLES = [
   "Intelligent Systems Architect"
 ];
 
-const PHILOSOPHY_PILLARS = [
+const CORE_EXPERTISE = [
   {
-    icon: ShieldCheck,
-    title: "Zero Hallucination Grounding",
-    desc: "Chatbots are just the baseline. I build deterministic AI systems grounded in structured knowledge bases, AST graphs, and verified domain sources."
+    category: "Artificial Intelligence",
+    skills: ["LLMs", "Retrieval-Augmented Generation (RAG)", "Model Context Protocol (MCP)", "LangChain", "LangGraph", "Prompt Engineering"]
   },
   {
-    icon: Zap,
-    title: "Sub-Second Latency Realism",
-    desc: "Performance is a feature. Optimizing multi-stage speech-to-text, machine translation, and LLM inference pipelines for low-latency production response."
+    category: "Machine Learning",
+    skills: ["Machine Learning", "Deep Learning", "Feature Engineering", "Model Evaluation", "Mathematics", "Statistics"]
   },
   {
-    icon: Cpu,
-    title: "Edge & Cloud Architecture",
-    desc: "From serverless cloud LLM deployments on AWS Bedrock to quantized YOLOv8 object detection on microcontrollers like ESP32."
+    category: "Computer Vision",
+    skills: ["YOLOv8", "OCR", "OpenCV", "Image Processing", "Edge AI"]
+  },
+  {
+    category: "Backend & Cloud",
+    skills: ["FastAPI", "REST APIs", "AWS", "Docker", "MongoDB", "PostgreSQL"]
+  },
+  {
+    category: "Languages",
+    skills: ["Python", "C++", "SQL", "TypeScript", "JavaScript"]
+  },
+  {
+    category: "Tools & Ecosystem",
+    skills: ["Git", "GitHub", "Linux", "VS Code", "Jupyter", "Kaggle"]
   }
 ];
 
@@ -187,7 +196,7 @@ const SOCIAL_LINKS = {
 };
 
 const PALETTE_COMMANDS = [
-  { id: "philosophy", label: "Engineering Philosophy", category: "Navigation", hint: "Zero-hallucination, latency, edge" },
+  { id: "expertise", label: "Core Expertise", category: "Navigation", hint: "AI, ML, Vision, Cloud, Languages" },
   { id: "projects", label: "Flagship Projects", category: "Navigation", hint: "Sanjeevani, Codrix.AI, MedReport, Road Damage" },
   { id: "sanjeevani", label: "Sanjeevani AI", category: "Flagship Work", hint: "Voice-first multilingual healthcare triage" },
   { id: "codrix", label: "Codrix.AI", category: "Flagship Work", hint: "Codebase AST knowledge graph" },
@@ -677,7 +686,7 @@ export default function Portfolio() {
           </div>
 
           <nav className="nav-links">
-            <button onClick={() => scrollToSection("philosophy")}>Philosophy</button>
+            <button onClick={() => scrollToSection("expertise")}>Expertise</button>
             <button onClick={() => scrollToSection("projects")}>Work</button>
             <button onClick={() => scrollToSection("journey")}>Journey</button>
             <button onClick={() => scrollToSection("contact")}>Contact</button>
@@ -775,39 +784,38 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* ENGINEERING PHILOSOPHY */}
-      <section id="philosophy" className="section philosophy-section">
+      {/* CORE EXPERTISE */}
+      <section id="expertise" className="section expertise-section">
         <div className="section-container">
           <div className="section-header">
-            <span className="section-eyebrow">ENGINEERING PHILOSOPHY</span>
-            <h2 className="section-title">Beyond Chatbots & Toy Demos.</h2>
+            <span className="section-eyebrow">CORE EXPERTISE</span>
+            <h2 className="section-title">Technical Domains & Capabilities</h2>
             <p className="section-desc">
-              Building AI is not about wrapping an API endpoint in a standard UI component.
-              It is about deterministic grounding, latency control, and real-world system resilience.
+              Core competencies spanning production Generative AI, deep learning, computer vision, and cloud infrastructure.
             </p>
           </div>
 
-          <div className="philosophy-grid">
-            {PHILOSOPHY_PILLARS.map((pillar, idx) => {
-              const Icon = pillar.icon;
-              return (
-                <TiltCard key={pillar.title} className="philosophy-card-tilt-wrap">
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.6, delay: idx * 0.15 }}
-                    className="philosophy-card"
-                  >
-                    <div className="philosophy-icon">
-                      <Icon size={24} />
-                    </div>
-                    <h3 className="philosophy-card-title">{pillar.title}</h3>
-                    <p className="philosophy-card-desc">{pillar.desc}</p>
-                  </motion.div>
-                </TiltCard>
-              );
-            })}
+          <div className="expertise-list">
+            {CORE_EXPERTISE.map((item, idx) => (
+              <motion.div
+                key={item.category}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5, delay: idx * 0.08 }}
+                className="expertise-row"
+              >
+                <h3 className="expertise-category">{item.category}</h3>
+                <div className="expertise-skills">
+                  {item.skills.map((skill, sIdx) => (
+                    <span key={skill} className="expertise-skill-item">
+                      {skill}
+                      {sIdx < item.skills.length - 1 && <span className="expertise-bullet">•</span>}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -1757,49 +1765,71 @@ html, body, #root {
   line-height: 1.6;
 }
 
-/* -------- PHILOSOPHY SECTION -------- */
-.philosophy-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.philosophy-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 36px 30px;
-  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
-}
-
-.philosophy-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 10px 35px rgba(245, 158, 11, 0.12);
-}
-
-.philosophy-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--accent-soft);
-  color: var(--accent);
+/* -------- CORE EXPERTISE SECTION -------- */
+.expertise-list {
   display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.expertise-row {
+  display: grid;
+  grid-template-columns: 280px 1fr;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 24px;
+  gap: 32px;
+  padding: 32px 16px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 8px;
+  transition: background 0.25s, padding-left 0.25s;
 }
 
-.philosophy-card-title {
+.expertise-row:hover {
+  background: var(--accent-soft);
+  padding-left: 24px;
+}
+
+.expertise-category {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
-  margin-bottom: 12px;
+  color: var(--text);
+  letter-spacing: -0.02em;
 }
 
-.philosophy-card-desc {
-  font-size: 14.5px;
+.expertise-skills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.expertise-skill-item {
+  font-size: 16px;
   color: var(--text-muted);
-  line-height: 1.65;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  transition: color 0.2s;
+}
+
+.expertise-row:hover .expertise-skill-item {
+  color: var(--text);
+}
+
+.expertise-bullet {
+  color: var(--accent);
+  opacity: 0.6;
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .expertise-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 24px 8px;
+  }
 }
 
 /* -------- FLAGSHIP PROJECTS SHOWCASE -------- */
