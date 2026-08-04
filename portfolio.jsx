@@ -662,11 +662,39 @@ export default function Portfolio() {
     }
   };
 
-  const handleContactSubmit = (e) => {
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
     const { name, email, message } = contactForm;
-    const subject = encodeURIComponent(`Portfolio inquiry from ${name || "Visitor"}`);
-    const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
+    triggerToast("Sending message to agrawalvishal804@gmail.com...");
+
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/agrawalvishal804@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          message: message,
+          _subject: `Portfolio Message from ${name}`
+        })
+      });
+
+      if (response.ok) {
+        setContactSent(true);
+        triggerToast("Message sent successfully to agrawalvishal804@gmail.com!");
+        setContactForm({ name: "", email: "", message: "" });
+        return;
+      }
+    } catch (err) {
+      console.warn("FormSubmit fetch fallback to mailto", err);
+    }
+
+    // Fallback to pre-filled mailto directly to agrawalvishal804@gmail.com
+    const subject = encodeURIComponent(`Portfolio Message from ${name || "Visitor"}`);
+    const body = encodeURIComponent(`From: ${name} (${email})\n\nMessage:\n${message}`);
     window.location.href = `mailto:agrawalvishal804@gmail.com?subject=${subject}&body=${body}`;
     setContactSent(true);
     triggerToast("Opening mail client...");
@@ -1135,7 +1163,7 @@ export default function Portfolio() {
                 </button>
                 {contactSent && (
                   <p className="contact-success-msg">
-                    <CheckCircle2 size={15} /> Opening mail client...
+                    <CheckCircle2 size={15} /> Message sent directly to agrawalvishal804@gmail.com!
                   </p>
                 )}
               </form>
