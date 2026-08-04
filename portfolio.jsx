@@ -104,60 +104,81 @@ const FLAGSHIP_PROJECTS = [
     github: "https://github.com/vishal88736"
   },
   {
-    id: "medreport",
+    id: "careertrajectory",
     number: "03",
-    title: "AI Medical Report Analyzer",
-    tagline: "OCR + RAG Document Intelligence Engine",
-    accent: "#10b981",
-    videoPlaceholder: "https://assets.mixkit.co/videos/preview/mixkit-hand-holding-a-futuristic-holographic-screen-41584-large.mp4",
-    poster: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1600&q=80",
+    title: "CareerTrajectory AI",
+    tagline: "Redefining Talent Intelligence Beyond Traditional ATS",
+    accent: "#8b5cf6",
+    videoPlaceholder: "https://assets.mixkit.co/videos/preview/mixkit-network-connection-lines-in-the-dark-41588-large.mp4",
+    poster: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1600&q=80",
     story: {
-      problem: "Scanned medical lab documents contain complex jargon that patients cannot easily interpret or cross-reference over time.",
-      solution: "Extracts structured clinical data from scanned PDFs via OCR, running grounded vector retrieval to produce confidence-ranked, layman-accessible diagnostic summaries.",
+      problem: "Traditional ATS keyword matching fails to evaluate engineering capability, project sophistication, learning trajectory, or actual candidate problem-solving maturity.",
+      solution: "A multi-agent talent intelligence platform using specialized LLM agents, Neo4j knowledge graphs, and vector search to evaluate candidates, predict growth trajectory, and produce explainable ranking reports.",
       architecture: [
-        { stage: "Document Input", tech: "PDF / Image Upload", detail: "Accepts multi-page lab reports, blood tests, and MRI scans." },
-        { stage: "OCR Extraction", tech: "Tesseract / EasyOCR", detail: "Binarizes and extracts raw text coordinates from document images." },
-        { stage: "Text Normalization", tech: "Regex & NLP Pipeline", detail: "Standardizes medical units, test names, and reference ranges." },
-        { stage: "RAG Lookup", tech: "Medical Knowledge Store", detail: "Retrieves peer-reviewed medical literature explaining test flags." },
-        { stage: "Explanation Output", tech: "Confidence Ranked Insights", detail: "Outputs patient summaries with clear risk ratings." }
+        { stage: "Resume Parsing", tech: "Multi-Modal Parsing", detail: "Deep semantic extraction of projects, research, technical depth, and competitive programming." },
+        { stage: "Embedding Generation", tech: "Vector Embeddings", detail: "Generates dense semantic vector embeddings for job-candidate context matching." },
+        { stage: "Knowledge Graph", tech: "Neo4j Graph Database", detail: "Maps caller skills, class hierarchies, project dependencies, and domain bindings." },
+        { stage: "Multi-Agent Analysis", tech: "LangGraph Agents", detail: "Orchestrates Resume, Job, Skill, Momentum, and Behavioral Evidence agents." },
+        { stage: "Explainable Output", tech: "Explainability Engine", detail: "Produces recruiter-friendly summaries, interview topic prompts, and future potential scores." }
       ],
-      challenge: "Noisy Document Ingestion: Maintaining 98%+ extraction accuracy on low-resolution, tilted, or hand-annotated lab reports without introducing false diagnostic parameters.",
+      challenge: "Explainable Multi-Agent Latency: Coordinating 7 specialized LLM agents while delivering transparent candidate rankings without black-box opacity or high latency.",
       results: [
-        "98%+ Extraction Accuracy",
-        "Confidence-Ranked Explanations",
-        "Longitudinal Health Metric Tracking"
+        "Multi-Agent Candidate Evaluation",
+        "Explainable Transparent Scoring",
+        "10x Deeper Technical Capability Ranking"
       ],
-      techStack: ["OCR", "RAG", "Vector Search", "LangChain", "Python", "Streamlit"]
+      techStack: ["React", "TypeScript", "FastAPI", "Python", "LangGraph", "LangChain", "AWS Bedrock", "Neo4j", "PostgreSQL", "RAG"]
     },
     github: "https://github.com/vishal88736"
   },
   {
-    id: "roaddamage",
+    id: "cottonfield",
     number: "04",
-    title: "Road Damage Detection",
-    tagline: "Real-Time Edge AI on ESP32 & Inspection Drones",
-    accent: "#f97316",
+    title: "Cotton Field Analysis",
+    tagline: "AI-Powered Crop Intelligence from High-Resolution Orthomosaic Imagery",
+    accent: "#10b981",
     videoPlaceholder: "https://assets.mixkit.co/videos/preview/mixkit-technology-network-lines-and-dots-41580-large.mp4",
-    poster: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1600&q=80",
+    poster: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=80",
     story: {
-      problem: "Traditional road defect surveys rely on dangerous manual labor or expensive high-bandwidth cloud video streaming.",
-      solution: "A lightweight YOLOv8 vision pipeline deployed directly on low-power ESP32 hardware to detect structural road damage from drone video streams in real time.",
+      problem: "Manual inspection of thousands of plants across large-scale field survey orthomosaics is slow, costly, and inconsistent under variable lighting, shadows, and aerial blur.",
+      solution: "A computer vision pipeline combining Restormer/FFTFormer image enhancement with deep learning crop classification on high-resolution orthomosaic patch tiles.",
       architecture: [
-        { stage: "Video Capture", tech: "Drone Camera Module", detail: "Streams 1080p video frames from drone payload." },
-        { stage: "Edge Preprocess", tech: "Frame Quantization", detail: "Downsamples and resizes image tensors for edge SRAM." },
-        { stage: "Inference", tech: "Quantized YOLOv8", detail: "Detects potholes, cracks, and structural road defects." },
-        { stage: "Edge Alerting", tech: "ESP32 Hardware Output", detail: "Triggers immediate hardware GPIO flags on critical road damage." },
-        { stage: "Telemetry Log", tech: "GPS & Coordinates", detail: "Geotags defects onto an interactive infrastructure inspection map." }
+        { stage: "Drone Survey", tech: "1080p Aerial Imagery", detail: "Collects high-resolution drone orthomosaic imagery across large field acreage." },
+        { stage: "Orthomosaic Tiling", tech: "Patch Extraction", detail: "Divides multi-gigabyte orthomosaic images into manageable spatial patch tiles." },
+        { stage: "Image Enhancement", tech: "Restormer / FFTFormer", detail: "Restores image quality, denoises low-quality regions, and enhances contrast before model inference." },
+        { stage: "Deep Learning", tech: "PyTorch Classification", detail: "Runs deep neural network classification on enhanced crop patch tiles." },
+        { stage: "Field Insights", tech: "Health Map Generation", detail: "Generates field-level crop health condition reports across entire farms." }
       ],
-      challenge: "Resource Constraints: Fitting deep neural network parameters into tight microcontroller SRAM/Flash constraints while sustaining 30 FPS inference without thermal throttling.",
+      challenge: "High-Resolution Memory & Restoration: Processing multi-gigabyte orthomosaic maps without memory exhaustion while boosting classification accuracy via restoration preprocessing.",
       results: [
-        "30 FPS Real-Time Edge Inference",
-        "Low-Power ESP32 Hardware Deployment",
-        "Zero Cloud Bandwidth Dependency"
+        "Field-Scale Orthomosaic Intelligence",
+        "Restormer Image Restoration Pipeline",
+        "Robust Crop Health Classification"
       ],
-      techStack: ["YOLOv8", "ESP32", "OpenCV", "Edge AI", "C++", "Python"]
+      techStack: ["PyTorch", "OpenCV", "Computer Vision", "Restormer", "FFTFormer", "Python", "Image Processing", "Deep Learning"]
     },
     github: "https://github.com/vishal88736"
+  }
+];
+
+const UPCOMING_PROJECTS = [
+  {
+    id: "cryptrix",
+    title: "Cryptrix",
+    subtitle: "AI Trading Intelligence Platform",
+    status: "IN DEVELOPMENT",
+    accent: "#f59e0b",
+    desc: "Building an AI-powered platform for crypto market intelligence, sentiment analysis, and trading insights with intelligent monitoring and automated signal analysis.",
+    tech: ["LangGraph", "FastAPI", "WebSockets", "Crypto Intelligence"]
+  },
+  {
+    id: "novatune",
+    title: "NovaTune",
+    subtitle: "Next-Generation AI Workflows",
+    status: "RESEARCH & DEVELOPMENT",
+    accent: "#3b82f6",
+    desc: "Exploring and designing a new AI system focused on advanced intelligent workflows, automated agent execution, and scalable AI user experiences.",
+    tech: ["Multi-Agent Systems", "Agentic AI", "Autonomous Workflows"]
   }
 ];
 
@@ -197,11 +218,12 @@ const SOCIAL_LINKS = {
 
 const PALETTE_COMMANDS = [
   { id: "expertise", label: "Core Expertise", category: "Navigation", hint: "AI, ML, Vision, Cloud, Languages" },
-  { id: "projects", label: "Flagship Projects", category: "Navigation", hint: "Sanjeevani, Codrix.AI, MedReport, Road Damage" },
+  { id: "projects", label: "Flagship Projects", category: "Navigation", hint: "Sanjeevani, Codrix.AI, CareerTrajectory AI, Cotton Field" },
   { id: "sanjeevani", label: "Sanjeevani AI", category: "Flagship Work", hint: "Voice-first multilingual healthcare triage" },
   { id: "codrix", label: "Codrix.AI", category: "Flagship Work", hint: "Codebase AST knowledge graph" },
-  { id: "medreport", label: "Medical Report Analyzer", category: "Flagship Work", hint: "OCR + RAG diagnostic summaries" },
-  { id: "roaddamage", label: "Road Damage Detection", category: "Flagship Work", hint: "ESP32 edge YOLOv8 vision" },
+  { id: "careertrajectory", label: "CareerTrajectory AI", category: "Flagship Work", hint: "Talent intelligence & candidate evaluation platform" },
+  { id: "cottonfield", label: "Cotton Field Analysis", category: "Flagship Work", hint: "Crop health AI from orthomosaic imagery" },
+  { id: "upcoming", label: "Upcoming Projects", category: "Navigation", hint: "Cryptrix & NovaTune in active R&D" },
   { id: "journey", label: "Milestones & Journey", category: "Navigation", hint: "AWS Fellow, IIIT Naya Raipur" },
   { id: "contact", label: "Contact & Inquiries", category: "Navigation", hint: "Send a direct message" },
   { id: "action-copy-email", label: "Copy Email Address", category: "Actions", hint: "vishalagrawal8736@gmail.com", action: "copy-email" },
@@ -842,15 +864,36 @@ export default function Portfolio() {
                       <h3 className="project-title">{project.title}</h3>
                       <p className="project-tagline">{project.tagline}</p>
                     </div>
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="project-github-link"
-                      title="View Source on GitHub"
-                    >
-                      <Github size={18} /> Source <ArrowUpRight size={14} />
-                    </a>
+                    <div className="project-action-links">
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="project-github-link"
+                        title="View Source on GitHub"
+                      >
+                        <Github size={16} /> Source <ArrowUpRight size={14} />
+                      </a>
+                      {project.id === "sanjeevani" || project.id === "careertrajectory" ? (
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="project-action-link"
+                        >
+                          Live Demo <ExternalLink size={14} />
+                        </a>
+                      ) : (
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="project-action-link"
+                        >
+                          Documentation <FileText size={14} />
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   {/* Video / Visual Banner */}
@@ -867,9 +910,6 @@ export default function Portfolio() {
                       Your browser does not support HTML5 video.
                     </video>
                     <div className="project-banner-overlay" />
-                    <div className="project-banner-badge">
-                      <Play size={12} fill="currentColor" /> Cinematic Preview
-                    </div>
 
                     {/* Audio Waveform Visualizer for Sanjeevani */}
                     {project.id === "sanjeevani" && (
@@ -936,6 +976,52 @@ export default function Portfolio() {
                     </div>
                   </div>
                 </article>
+              </TiltCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* UPCOMING PROJECTS SECTION */}
+      <section id="upcoming" className="section upcoming-section">
+        <div className="section-container">
+          <div className="section-header">
+            <span className="section-eyebrow">ACTIVE R&D & IN DEVELOPMENT</span>
+            <h2 className="section-title">Upcoming Projects</h2>
+            <p className="section-desc">
+              Projects I'm currently building and researching in trading intelligence, agentic workflows, and system architecture.
+            </p>
+          </div>
+
+          <div className="upcoming-grid">
+            {UPCOMING_PROJECTS.map((proj, idx) => (
+              <TiltCard key={proj.id} className="upcoming-tilt-wrap">
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.5, delay: idx * 0.15 }}
+                  className="upcoming-card"
+                >
+                  <div className="upcoming-card-header">
+                    <span className="upcoming-badge" style={{ borderColor: proj.accent, color: proj.accent }}>
+                      <span className="status-dot-pulse" style={{ background: proj.accent }} />
+                      {proj.status}
+                    </span>
+                  </div>
+
+                  <h3 className="upcoming-title">{proj.title}</h3>
+                  <p className="upcoming-subtitle">{proj.subtitle}</p>
+                  <p className="upcoming-desc">{proj.desc}</p>
+
+                  <div className="upcoming-tech-pills">
+                    {proj.tech.map((t) => (
+                      <span key={t} className="upcoming-tech-pill">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
               </TiltCard>
             ))}
           </div>
@@ -2144,6 +2230,117 @@ html, body, #root {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   color: var(--text-muted);
+}
+
+.project-action-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.project-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  transition: all 0.2s;
+}
+
+.project-action-link:hover {
+  color: var(--text);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* -------- UPCOMING PROJECTS SECTION -------- */
+.upcoming-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+}
+
+.upcoming-tilt-wrap {
+  width: 100%;
+  transform-style: preserve-3d;
+}
+
+.upcoming-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.upcoming-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+.upcoming-card-header {
+  margin-bottom: 20px;
+}
+
+.upcoming-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid;
+  background: var(--accent-soft);
+}
+
+.upcoming-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.upcoming-subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.upcoming-desc {
+  font-size: 14.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 28px;
+  flex: 1;
+}
+
+.upcoming-tech-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.upcoming-tech-pill {
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
 }
 
 /* -------- JOURNEY SECTION -------- */
