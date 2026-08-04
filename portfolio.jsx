@@ -186,13 +186,13 @@ const JOURNEY_MILESTONES = [
   {
     org: "AI Durg & Gemma 4 Hackathon",
     role: "Hackathon Winner — Sanjeevani AI",
-    period: "2024",
+    period: "2026",
     desc: "Won 1st Place in the hackathon organized by AI Durg & Gemma 4 by engineering 'Sanjeevani' — a multilingual voice-first healthcare triage assistant powered by Gemma LLM."
   },
   {
     org: "AWS National Level Hackathon",
     role: "Prototype Stage Qualifier",
-    period: "2024",
+    period: "2026",
     desc: "Qualified the prototype level in the AWS National Level Hackathon, gaining deep hands-on expertise in AWS Cloud services, scalable infrastructure, and AI deployment."
   },
   {
@@ -213,11 +213,11 @@ const SOCIAL_LINKS = {
 
 const PALETTE_COMMANDS = [
   { id: "expertise", label: "Core Expertise", category: "Navigation", hint: "AI, ML, Vision, Cloud, Languages" },
-  { id: "projects", label: "Flagship Projects", category: "Navigation", hint: "Sanjeevani, Codrix.AI, CareerTrajectory AI, Cotton Field" },
-  { id: "sanjeevani", label: "Sanjeevani AI", category: "Flagship Work", hint: "Voice-first multilingual healthcare triage" },
-  { id: "codrix", label: "Codrix.AI", category: "Flagship Work", hint: "Codebase AST knowledge graph" },
-  { id: "careertrajectory", label: "CareerTrajectory AI", category: "Flagship Work", hint: "Talent intelligence & candidate evaluation platform" },
-  { id: "cottonfield", label: "Cotton Field Analysis", category: "Flagship Work", hint: "Crop health AI from orthomosaic imagery" },
+  { id: "projects", label: "Projects", category: "Navigation", hint: "Sanjeevani, Codrix.AI, CareerTrajectory AI, Cotton Field" },
+  { id: "sanjeevani", label: "Sanjeevani AI", category: "Projects", hint: "Voice-first multilingual healthcare triage" },
+  { id: "codrix", label: "Codrix.AI", category: "Projects", hint: "Codebase AST knowledge graph" },
+  { id: "careertrajectory", label: "CareerTrajectory AI", category: "Projects", hint: "Talent intelligence & candidate evaluation platform" },
+  { id: "cottonfield", label: "Cotton Field Analysis", category: "Projects", hint: "Crop health AI from orthomosaic imagery" },
   { id: "upcoming", label: "Upcoming Projects", category: "Navigation", hint: "Cryptrix & NovaTune in active R&D" },
   { id: "journey", label: "Milestones & Journey", category: "Navigation", hint: "AI Durg & Gemma Winner, AWS Hackathon, CodeChef 2★" },
   { id: "contact", label: "Contact & Inquiries", category: "Navigation", hint: "Send a direct message" },
@@ -723,7 +723,6 @@ export default function Portfolio() {
             <VALogo size={32} />
             <div className="brand-text">
               <span className="brand-name">Vishal Agrawal</span>
-              <span className="brand-sub">AI & Systems</span>
             </div>
           </button>
 
@@ -772,8 +771,6 @@ export default function Portfolio() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="hero-eyebrow"
           >
-            <span>VISHAL AGRAWAL</span>
-            <span className="eyebrow-divider">•</span>
             <span>BUILDING PRODUCTION AI</span>
           </motion.div>
 
@@ -820,7 +817,7 @@ export default function Portfolio() {
             className="hero-actions"
           >
             <MagneticButton className="btn btn-primary" onClick={() => scrollToSection("projects")}>
-              Explore Flagship Work <ArrowRight size={16} />
+              Explore Projects <ArrowRight size={16} />
             </MagneticButton>
             <MagneticButton className="btn btn-secondary" onClick={() => scrollToSection("contact")}>
               Get in Touch
@@ -868,12 +865,12 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* FLAGSHIP PROJECTS SHOWCASE */}
+      {/* PROJECTS SHOWCASE */}
       <section id="projects" className="section projects-section">
         <div className="section-container">
           <div className="section-header">
             <span className="section-eyebrow">FEATURED WORK</span>
-            <h2 className="section-title">Flagship Engineering Projects</h2>
+            <h2 className="section-title">Engineering Projects</h2>
             <p className="section-desc">
               Four production-focused systems engineered from zero to execution. Click any architecture stage below to inspect system details.
             </p>
@@ -1839,7 +1836,7 @@ html, body, #root {
 
 /* -------- SECTIONS & LAYOUT -------- */
 .section {
-  padding: 120px 24px;
+  padding: 60px 24px;
 }
 
 .section-container {
@@ -1848,7 +1845,7 @@ html, body, #root {
 }
 
 .section-header {
-  margin-bottom: 64px;
+  margin-bottom: 36px;
   text-align: left;
 }
 
