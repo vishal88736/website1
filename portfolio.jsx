@@ -1,2606 +1,1932 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import {
-  ArrowUpRight, Github, Linkedin, Mail, Twitter, ChevronRight,
-  Sparkles, Code2, Cpu, Database, Layers, ShieldCheck, Terminal,
-  ExternalLink, Sun, Moon, ArrowRight, Play, CheckCircle2,
-  FileText, Activity, Server, Zap, Compass, Send, Search, Command,
-  Copy, Check, Radio, CornerDownLeft
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useMotionValue,
+  useInView,
+} from "framer-motion";
+import {
+  ArrowDown,
+  ArrowUpRight,
+  ArrowRight,
+  Check,
+  Copy,
+  Github,
+  Linkedin,
+  Menu,
+  Plus,
+  X,
+  Sun,
+  Moon,
+  Send,
+  Terminal,
+  Brain,
+  Cpu,
+  Eye,
+  Server,
+  Code2,
+  GitBranch,
 } from "lucide-react";
+import {
+  projects,
+  expertise,
+  upcoming,
+  milestones,
+  links,
+} from "./src/data/portfolio";
+import { stopSmooth, startSmooth } from "./src/components/SmoothScroll";
+import "./src/styles/portfolio.css";
 
-/* =================================================================
-   DATA & CONSTANTS
-================================================================= */
-
+const EMAIL = links.email.replace("mailto:", "");
 const ROLES = [
   "AI Engineer",
   "Machine Learning Engineer",
   "Generative AI Developer",
-  "Intelligent Systems Architect"
+  "Intelligent Systems Architect",
 ];
-
-const CORE_EXPERTISE = [
-  {
-    category: "Artificial Intelligence",
-    skills: ["LLMs", "Retrieval-Augmented Generation (RAG)", "Model Context Protocol (MCP)", "LangChain", "LangGraph", "Prompt Engineering"]
-  },
-  {
-    category: "Machine Learning",
-    skills: ["Machine Learning", "Deep Learning", "Feature Engineering", "Model Evaluation", "Mathematics", "Statistics"]
-  },
-  {
-    category: "Computer Vision",
-    skills: ["YOLOv8", "OCR", "OpenCV", "Image Processing", "Edge AI"]
-  },
-  {
-    category: "Backend & Cloud",
-    skills: ["FastAPI", "REST APIs", "AWS", "Docker", "MongoDB", "PostgreSQL"]
-  },
-  {
-    category: "Languages",
-    skills: ["Python", "C++", "SQL", "TypeScript", "JavaScript"]
-  },
-  {
-    category: "Tools & Ecosystem",
-    skills: ["Git", "GitHub", "Linux", "VS Code", "Jupyter", "Kaggle"]
-  }
+const NAVIGATION = [
+  ["work", "Work"],
+  ["about", "About"],
+  ["recognition", "Recognition"],
 ];
-
-const FLAGSHIP_PROJECTS = [
-  {
-    id: "sanjeevani",
-    number: "01",
-    title: "Sanjeevani",
-    tagline: "Multilingual Voice-First Healthcare AI Triage",
-    accent: "#f59e0b",
-    videoPlaceholder: "https://assets.mixkit.co/videos/preview/mixkit-medical-technology-animation-41586-large.mp4",
-    poster: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80",
-    story: {
-      problem: "Healthcare advice in rural regions is bottlenecked by dialect barriers, high diagnostic costs, and critical time delays.",
-      solution: "A voice-first assistant supporting 6+ Indic languages that transcribes, translates, and triages patient symptoms grounded in official WHO medical guidance.",
-      architecture: [
-        { stage: "Speech Input", tech: "IndicConformer", detail: "Transcribes raw audio into Indic text tokens in real time." },
-        { stage: "Translation", tech: "IndicTrans2", detail: "Translates regional Indic languages into English for core LLM processing." },
-        { stage: "Retrieval", tech: "FAISS Vector RAG", detail: "Performs dense semantic vector search against WHO medical guidelines." },
-        { stage: "Reasoning", tech: "Gemma LLM", detail: "Drafts grounded clinical triage advice with source citation bounds." },
-        { stage: "Verification", tech: "WHO Medical Rules", detail: "Runs automated deterministic safety checks before back-translating audio." }
-      ],
-      challenge: "Pipeline Latency & Reliability: Chaining 5 separate AI models (speech, translation, vector retrieval, LLM generation, and back-translation) while guaranteeing end-to-end response times under 1.2s.",
-      results: [
-        "6+ Indic Dialects Supported",
-        "Sub-1.2s End-to-End Latency",
-        "100% Grounded in WHO Guidelines"
-      ],
-      techStack: ["PyTorch", "Gemma", "IndicTrans2", "IndicConformer", "FAISS", "AWS Bedrock", "RAG"]
-    },
-    github: "https://github.com/vishal88736/sanjeevani"
-  },
-  {
-    id: "codrix",
-    number: "02",
-    title: "Codrix.AI",
-    tagline: "Codebase Intelligence & AST Knowledge Graph",
-    accent: "#3b82f6",
-    videoPlaceholder: "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-data-41582-large.mp4",
-    poster: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1600&q=80",
-    story: {
-      problem: "Onboarding onto complex multi-repository codebases requires days of manual code tracing and opaque architectural context.",
-      solution: "Normalizes raw source repositories into Abstract Syntax Trees (AST) mapped into a vector queryable dependency graph for real-time architectural interrogation.",
-      architecture: [
-        { stage: "Source Code", tech: "Git / Local Repo", detail: "Indexes repository file trees and tracks git delta commits." },
-        { stage: "AST Parsing", tech: "Tree-sitter Engine", detail: "Parses source code into structured Abstract Syntax Trees." },
-        { stage: "Graph Extraction", tech: "Symbol Dependency Tree", detail: "Maps caller-callee bindings, class hierarchies, and import graphs." },
-        { stage: "Vector Index", tech: "FAISS / Embeddings", detail: "Embeds code snippets and docstrings for semantic symbol query." },
-        { stage: "Multi-Agent Query", tech: "LangChain Agents", detail: "Runs blast-radius analysis to evaluate code modification impacts." }
-      ],
-      challenge: "Semantic Precision: Preserving scope boundaries, caller-callee relationships, and multi-language syntax definitions across thousands of source files simultaneously.",
-      results: [
-        "Instant Blast-Radius Analysis",
-        "Multi-Language AST Normalization",
-        "10x Faster Codebase Onboarding"
-      ],
-      techStack: ["Python", "Tree-sitter", "LangChain", "FAISS", "Multi-Agent Systems", "Vector Search"]
-    },
-    github: "https://github.com/vishal88736"
-  },
-  {
-    id: "careertrajectory",
-    number: "03",
-    title: "CareerTrajectory AI",
-    tagline: "Redefining Talent Intelligence Beyond Traditional ATS",
-    accent: "#8b5cf6",
-    videoPlaceholder: "https://assets.mixkit.co/videos/preview/mixkit-network-connection-lines-in-the-dark-41588-large.mp4",
-    poster: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1600&q=80",
-    story: {
-      problem: "Traditional ATS keyword matching fails to evaluate engineering capability, project sophistication, learning trajectory, or actual candidate problem-solving maturity.",
-      solution: "A multi-agent talent intelligence platform using specialized LLM agents, Neo4j knowledge graphs, and vector search to evaluate candidates, predict growth trajectory, and produce explainable ranking reports.",
-      architecture: [
-        { stage: "Resume Parsing", tech: "Multi-Modal Parsing", detail: "Deep semantic extraction of projects, research, technical depth, and competitive programming." },
-        { stage: "Embedding Generation", tech: "Vector Embeddings", detail: "Generates dense semantic vector embeddings for job-candidate context matching." },
-        { stage: "Knowledge Graph", tech: "Neo4j Graph Database", detail: "Maps caller skills, class hierarchies, project dependencies, and domain bindings." },
-        { stage: "Multi-Agent Analysis", tech: "LangGraph Agents", detail: "Orchestrates Resume, Job, Skill, Momentum, and Behavioral Evidence agents." },
-        { stage: "Explainable Output", tech: "Explainability Engine", detail: "Produces recruiter-friendly summaries, interview topic prompts, and future potential scores." }
-      ],
-      challenge: "Explainable Multi-Agent Latency: Coordinating 7 specialized LLM agents while delivering transparent candidate rankings without black-box opacity or high latency.",
-      results: [
-        "Multi-Agent Candidate Evaluation",
-        "Explainable Transparent Scoring",
-        "10x Deeper Technical Capability Ranking"
-      ],
-      techStack: ["React", "TypeScript", "FastAPI", "Python", "LangGraph", "LangChain", "AWS Bedrock", "Neo4j", "PostgreSQL", "RAG"]
-    },
-    github: "https://github.com/vishal88736"
-  },
-  {
-    id: "cottonfield",
-    number: "04",
-    title: "Cotton Field Analysis",
-    tagline: "AI-Powered Crop Intelligence from High-Resolution Orthomosaic Imagery",
-    accent: "#10b981",
-    videoPlaceholder: "https://assets.mixkit.co/videos/preview/mixkit-technology-network-lines-and-dots-41580-large.mp4",
-    poster: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=80",
-    story: {
-      problem: "Manual inspection of thousands of plants across large-scale field survey orthomosaics is slow, costly, and inconsistent under variable lighting, shadows, and aerial blur.",
-      solution: "A computer vision pipeline combining Restormer/FFTFormer image enhancement with deep learning crop classification on high-resolution orthomosaic patch tiles.",
-      architecture: [
-        { stage: "Drone Survey", tech: "1080p Aerial Imagery", detail: "Collects high-resolution drone orthomosaic imagery across large field acreage." },
-        { stage: "Orthomosaic Tiling", tech: "Patch Extraction", detail: "Divides multi-gigabyte orthomosaic images into manageable spatial patch tiles." },
-        { stage: "Image Enhancement", tech: "Restormer / FFTFormer", detail: "Restores image quality, denoises low-quality regions, and enhances contrast before model inference." },
-        { stage: "Deep Learning", tech: "PyTorch Classification", detail: "Runs deep neural network classification on enhanced crop patch tiles." },
-        { stage: "Field Insights", tech: "Health Map Generation", detail: "Generates field-level crop health condition reports across entire farms." }
-      ],
-      challenge: "High-Resolution Memory & Restoration: Processing multi-gigabyte orthomosaic maps without memory exhaustion while boosting classification accuracy via restoration preprocessing.",
-      results: [
-        "Field-Scale Orthomosaic Intelligence",
-        "Restormer Image Restoration Pipeline",
-        "Robust Crop Health Classification"
-      ],
-      techStack: ["PyTorch", "OpenCV", "Computer Vision", "Restormer", "FFTFormer", "Python", "Image Processing", "Deep Learning"]
-    },
-    github: "https://github.com/vishal88736"
-  }
+const MARQUEE_ITEMS = [
+  "RAG Pipelines",
+  "LangGraph Agents",
+  "Multilingual Voice AI",
+  "Vector Search",
+  "PyTorch",
+  "AST Knowledge Graphs",
+  "Neo4j",
+  "FastAPI",
+  "Computer Vision",
+  "Edge AI",
 ];
-
-const UPCOMING_PROJECTS = [
+const STATS = [
+  { value: 6, suffix: "+", label: "Indic dialects speaking to Sanjeevani" },
   {
-    id: "cryptrix",
-    title: "Cryptrix",
-    subtitle: "AI Trading Intelligence Platform",
-    status: "IN DEVELOPMENT",
-    accent: "#f59e0b",
-    desc: "Building an AI-powered platform for crypto market intelligence, sentiment analysis, and trading insights with intelligent monitoring and automated signal analysis.",
-    tech: ["LangGraph", "FastAPI", "WebSockets", "Crypto Intelligence"]
+    value: 1.2,
+    decimals: 1,
+    prefix: "<",
+    suffix: "s",
+    label: "End-to-end voice-to-triage latency",
   },
-  {
-    id: "novatune",
-    title: "NovaTune",
-    subtitle: "Next-Generation AI Workflows",
-    status: "RESEARCH & DEVELOPMENT",
-    accent: "#3b82f6",
-    desc: "Exploring and designing a new AI system focused on advanced intelligent workflows, automated agent execution, and scalable AI user experiences.",
-    tech: ["Multi-Agent Systems", "Agentic AI", "Autonomous Workflows"]
-  }
+  { value: 200, suffix: "+", label: "DSA problems solved across platforms" },
+  { value: 10, suffix: "×", label: "Faster onboarding with Codrix.AI" },
 ];
-
-const JOURNEY_MILESTONES = [
-  {
-    org: "AI Durg & Gemma 4 Hackathon",
-    role: "Hackathon Winner — Sanjeevani AI",
-    period: "2026",
-    desc: "Won 1st Place in the hackathon organized by AI Durg & Gemma 4 by engineering 'Sanjeevani' — a multilingual voice-first healthcare triage assistant powered by Gemma LLM."
-  },
-  {
-    org: "AWS National Level Hackathon",
-    role: "Prototype Stage Qualifier",
-    period: "2026",
-    desc: "Qualified the prototype level in the AWS National Level Hackathon, gaining deep hands-on expertise in AWS Cloud services, scalable infrastructure, and AI deployment."
-  },
-  {
-    org: "Competitive Programming",
-    role: "CodeChef 2★ · 200+ Problems Solved Across Platforms",
-    period: "Ongoing",
-    desc: "Achieved CodeChef 2★ rating and solved 200+ algorithmic problems across all competitive coding platforms, mastering graph theory, dynamic programming, and core data structures."
-  }
-];
-
-const SOCIAL_LINKS = {
-  github: "https://github.com/vishal88736",
-  linkedin: "https://www.linkedin.com/in/vishal-agrawal-1ba44532b/",
-  twitter: "https://x.com/vishal__0604",
-  email: "mailto:agrawalvishal804@gmail.com",
-  resume: "https://drive.google.com/file/d/1cRQsrwSxCf0lg_XXxF1i7ahrhkEpK7yd/view?usp=drive_link"
+const EXPERTISE_ICONS = {
+  "Artificial Intelligence": Brain,
+  "Machine Learning": Cpu,
+  "Computer Vision": Eye,
+  "Backend & Cloud": Server,
+  Languages: Code2,
+  "Tools & Ecosystem": GitBranch,
 };
+const EASE = [0.22, 1, 0.36, 1];
 
-const PALETTE_COMMANDS = [
-  { id: "expertise", label: "Core Expertise", category: "Navigation", hint: "AI, ML, Vision, Cloud, Languages" },
-  { id: "projects", label: "Projects", category: "Navigation", hint: "Sanjeevani, Codrix.AI, CareerTrajectory AI, Cotton Field" },
-  { id: "sanjeevani", label: "Sanjeevani AI", category: "Projects", hint: "Voice-first multilingual healthcare triage" },
-  { id: "codrix", label: "Codrix.AI", category: "Projects", hint: "Codebase AST knowledge graph" },
-  { id: "careertrajectory", label: "CareerTrajectory AI", category: "Projects", hint: "Talent intelligence & candidate evaluation platform" },
-  { id: "cottonfield", label: "Cotton Field Analysis", category: "Projects", hint: "Crop health AI from orthomosaic imagery" },
-  { id: "upcoming", label: "Upcoming Projects", category: "Navigation", hint: "Cryptrix & NovaTune in active R&D" },
-  { id: "journey", label: "Milestones & Journey", category: "Navigation", hint: "AI Durg & Gemma Winner, AWS Hackathon, CodeChef 2★" },
-  { id: "contact", label: "Contact & Inquiries", category: "Navigation", hint: "Send a direct message" },
-  { id: "action-copy-email", label: "Copy Email Address", category: "Actions", hint: "agrawalvishal804@gmail.com", action: "copy-email" },
-  { id: "action-resume", label: "Open Resume (Google Drive)", category: "External", hint: "View PDF Resume", action: "open-resume" },
-  { id: "action-toggle-theme", label: "Toggle Theme (Dark / Light)", category: "Actions", hint: "Switch visual theme", action: "toggle-theme" },
-  { id: "action-github", label: "Open GitHub Profile", category: "External", hint: "github.com/vishal88736", action: "open-github" }
-];
+/* ============================== hooks ============================== */
 
-/* =================================================================
-   CINEMATIC SPLASH SCREEN WITH 3D BOUNCING LETTERS & SCANNER BEAM
-================================================================= */
-
-function SplashScreen({ onComplete }) {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onComplete();
-    }, 3200);
-    return () => clearTimeout(timer);
-  }, [onComplete]);
-
-  const nameLetters = "VISHAL AGRAWAL".split("");
-
-  return (
-    <motion.div
-      className="splash-overlay"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 1.04, filter: "blur(16px)" }}
-      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <div className="splash-ambient-glow" />
-
-      <div className="splash-content">
-        {/* Animated 3D VA Logo */}
-        <motion.div
-          initial={{ scale: 0.3, opacity: 0, rotateX: -60, rotateY: 45 }}
-          animate={{ scale: 1, opacity: 1, rotateX: 0, rotateY: 0 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="splash-logo-container"
-        >
-          <VALogo size={72} />
-        </motion.div>
-
-        {/* 3D Perspective Letter Flip & Bounce */}
-        <div className="splash-name">
-          {nameLetters.map((char, index) => (
-            <motion.span
-              key={index}
-              initial={{ y: 45, opacity: 0, rotateX: 90, scale: 0.5 }}
-              animate={{
-                y: [45, -18, 0],
-                opacity: 1,
-                rotateX: [90, -15, 0],
-                scale: [0.5, 1.25, 1],
-              }}
-              transition={{
-                duration: 0.75,
-                delay: 0.25 + index * 0.04,
-                ease: [0.34, 1.56, 0.64, 1],
-              }}
-              className="splash-letter"
-            >
-              {char === " " ? "\u00A0" : char}
-            </motion.span>
-          ))}
-        </div>
-
-        {/* Tech Slogan with Scanner Line Beam */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 1.15, ease: [0.16, 1, 0.3, 1] }}
-          className="splash-slogan"
-        >
-          <span className="splash-slogan-line" />
-          <span className="slogan-text-glow">ENGINEERING THE INTELLIGENCE LAYER</span>
-          <span className="splash-slogan-line" />
-        </motion.div>
-
-        {/* Progress Track */}
-        <div className="splash-progress-track">
-          <motion.div
-            className="splash-progress-bar"
-            initial={{ width: "0%" }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 2.6, ease: "easeInOut" }}
-          />
-        </div>
-      </div>
-    </motion.div>
+function useTheme() {
+  const [theme, setTheme] = useState(
+    () => document.documentElement.dataset.theme || "dark",
   );
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem("va-theme", theme);
+    } catch {
+      /* private mode — theme simply won't persist */
+    }
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = theme === "light" ? "#f2eee3" : "#070907";
+  }, [theme]);
+  return [theme, () => setTheme((t) => (t === "dark" ? "light" : "dark"))];
 }
 
-/* =================================================================
-   SMOOTH 3D TILT PERSPECTIVE CARD
-================================================================= */
+function useScrolled(offset = 16) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > offset);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [offset]);
+  return scrolled;
+}
 
-function TiltCard({ children, className = "", ...props }) {
-  const ref = useRef(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+function useFinePointer() {
+  const [fine] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(pointer: fine)").matches,
+  );
+  return fine;
+}
 
-  const handleMouseMove = (e) => {
-    if (!ref.current) return;
-    const { left, top, width, height } = ref.current.getBoundingClientRect();
-    const x = (e.clientX - left) / width - 0.5;
-    const y = (e.clientY - top) / height - 0.5;
-    setTilt({ x: y * -10, y: x * 10 });
-  };
+function useCountUp(
+  target,
+  { decimals = 0, duration = 1500, started = true } = {},
+) {
+  const [value, setValue] = useState(0);
+  const reduced = useReducedMotion();
+  useEffect(() => {
+    if (!started) return;
+    if (reduced) {
+      setValue(target);
+      return;
+    }
+    let raf;
+    const t0 = performance.now();
+    const tick = (t) => {
+      const p = Math.min(1, (t - t0) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setValue(target * eased);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration, started, reduced]);
+  return value.toFixed(decimals);
+}
 
-  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
+/* ====================== motion primitives ====================== */
 
+function Reveal({ children, className = "", delay = 0, y = 28 }) {
+  const reduced = useReducedMotion();
+  if (reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
-      ref={ref}
       className={className}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      animate={{ rotateX: tilt.x, rotateY: tilt.y }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      style={{ perspective: 1000 }}
-      {...props}
+      initial={{ opacity: 0, y, filter: "blur(6px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, amount: 0.12 }}
+      transition={{ duration: 0.75, delay, ease: EASE }}
     >
       {children}
     </motion.div>
   );
 }
 
-/* =================================================================
-   TOAST NOTIFICATION
-================================================================= */
-
-function Toast({ message }) {
+function Magnetic({ children, strength = 7 }) {
+  const ref = useRef(null);
+  const reduced = useReducedMotion();
+  const fine = useFinePointer();
+  function onMove(event) {
+    if (reduced || !fine || !ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    const x = event.clientX - (r.left + r.width / 2);
+    const y = event.clientY - (r.top + r.height / 2);
+    ref.current.style.transform = `translate(${(x / r.width) * strength}px, ${(y / r.height) * strength}px)`;
+  }
+  function onLeave() {
+    if (ref.current) ref.current.style.transform = "";
+  }
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -40, scale: 0.9 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.9 }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      className="toast-container"
+    <span
+      ref={ref}
+      className="magnetic"
+      onPointerMove={onMove}
+      onPointerLeave={onLeave}
+      style={{
+        display: "inline-flex",
+        transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
+      }}
     >
-      <CheckCircle2 size={16} className="toast-icon" />
-      <span>{message}</span>
-    </motion.div>
+      {children}
+    </span>
   );
 }
 
-/* =================================================================
-   INTERACTIVE ARCHITECTURE PIPELINE INSPECTOR
-================================================================= */
-
-function InteractiveArchitecturePipeline({ steps }) {
-  const [activeStep, setActiveStep] = useState(0);
-
+/** Card wrapper: cursor spotlight + subtle 3D tilt (fine pointers only). */
+function TiltCard({ children, className = "", max = 4 }) {
+  const ref = useRef(null);
+  const reduced = useReducedMotion();
+  const fine = useFinePointer();
+  function onMove(event) {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = (event.clientX - r.left) / r.width;
+    const py = (event.clientY - r.top) / r.height;
+    el.style.setProperty("--mx", `${px * 100}%`);
+    el.style.setProperty("--my", `${py * 100}%`);
+    el.style.setProperty("--sx", `${px * 100}%`);
+    if (reduced || !fine) return;
+    el.style.transform = `translateY(-4px) perspective(1100px) rotateX(${((0.5 - py) * max).toFixed(2)}deg) rotateY(${((px - 0.5) * max).toFixed(2)}deg)`;
+  }
+  function onLeave() {
+    if (ref.current) ref.current.style.transform = "";
+  }
   return (
-    <div className="interactive-arch-wrapper">
-      <div className="arch-steps-container">
-        {steps.map((arch, i) => {
-          const isActive = activeStep === i;
-          return (
-            <motion.div
-              key={arch.stage}
-              className={`arch-step-interactive ${isActive ? "arch-step--active" : ""}`}
-              onClick={() => setActiveStep(i)}
-              whileHover={{ scale: 1.02, x: 4 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="arch-step-header">
-                <span className="arch-num">0{i + 1}</span>
-                <span className="arch-stage">{arch.stage}</span>
-              </div>
-              <span className="arch-tech">{arch.tech}</span>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeStep}
-          initial={{ opacity: 0, x: 12 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -12 }}
-          transition={{ duration: 0.25 }}
-          className="arch-detail-box"
-        >
-          <span className="arch-detail-tag">STAGE 0{activeStep + 1} BREAKDOWN</span>
-          <h4 className="arch-detail-title">{steps[activeStep].stage} ({steps[activeStep].tech})</h4>
-          <p className="arch-detail-desc">{steps[activeStep].detail}</p>
-        </motion.div>
-      </AnimatePresence>
+    <div
+      ref={ref}
+      className={className}
+      onPointerMove={onMove}
+      onPointerLeave={onLeave}
+    >
+      {children}
     </div>
   );
 }
 
-/* =================================================================
-   COMMAND PALETTE MODAL (Cmd+K)
-================================================================= */
+/* ============================== loader ============================== */
 
-function CommandPalette({ isOpen, onClose, onSelect }) {
-  const [query, setQuery] = useState("");
-  const inputRef = useRef(null);
-
+function Loader({ onDone }) {
+  const [count, setCount] = useState(0);
+  const done = useRef(false);
+  function finish() {
+    if (done.current) return;
+    done.current = true;
+    onDone();
+  }
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      setQuery("");
-    }
-  }, [isOpen]);
-
-  const filteredCommands = useMemo(() => {
-    if (!query.trim()) return PALETTE_COMMANDS;
-    return PALETTE_COMMANDS.filter(
-      (cmd) =>
-        cmd.label.toLowerCase().includes(query.toLowerCase()) ||
-        cmd.category.toLowerCase().includes(query.toLowerCase()) ||
-        cmd.hint.toLowerCase().includes(query.toLowerCase())
-    );
-  }, [query]);
-
-  if (!isOpen) return null;
-
-  return (
-    <AnimatePresence>
-      <div className="palette-overlay" onClick={onClose}>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          transition={{ type: "spring", stiffness: 450, damping: 30 }}
-          className="palette-modal"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="palette-search-bar">
-            <Search size={18} className="palette-search-icon" />
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Search commands, projects, actions... (ESC to exit)"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <span className="palette-kbd">ESC</span>
-          </div>
-
-          <div className="palette-list">
-            {filteredCommands.length === 0 ? (
-              <div className="palette-empty">No matching commands found</div>
-            ) : (
-              filteredCommands.map((cmd) => (
-                <button
-                  key={cmd.id}
-                  className="palette-item"
-                  onClick={() => onSelect(cmd)}
-                >
-                  <div className="palette-item-left">
-                    <span className="palette-item-cat">{cmd.category}</span>
-                    <span className="palette-item-label">{cmd.label}</span>
-                  </div>
-                  <div className="palette-item-right">
-                    <span className="palette-item-hint">{cmd.hint}</span>
-                    <CornerDownLeft size={14} className="palette-enter-icon" />
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
-
-          <div className="palette-footer">
-            <span>Navigation: Use mouse or keyboard</span>
-            <span>Shortcut: <kbd>⌘K</kbd> or <kbd>Ctrl+K</kbd></span>
-          </div>
-        </motion.div>
-      </div>
-    </AnimatePresence>
-  );
-}
-
-/* =================================================================
-   CUSTOM HARDWARE-ACCELERATED CURSOR & MAGNETIC BUTTON
-================================================================= */
-
-function MagneticButton({ children, className = "", onClick, ...props }) {
-  const ref = useRef(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const handleMouse = (e) => {
-    const { clientX, clientY } = e;
-    const { height, width, left, top } = ref.current.getBoundingClientRect();
-    const middleX = clientX - (left + width / 2);
-    const middleY = clientY - (top + height / 2);
-    setPosition({ x: middleX * 0.15, y: middleY * 0.15 });
-  };
-
-  const reset = () => setPosition({ x: 0, y: 0 });
-
-  return (
-    <motion.button
-      ref={ref}
-      className={className}
-      onClick={onClick}
-      onMouseMove={handleMouse}
-      onMouseLeave={reset}
-      animate={{ x: position.x, y: position.y }}
-      transition={{ type: "spring", stiffness: 250, damping: 18, mass: 0.5 }}
-      {...props}
-    >
-      {children}
-    </motion.button>
-  );
-}
-
-function CustomCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    const onMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      const target = e.target;
-      if (
-        target.tagName === "BUTTON" ||
-        target.tagName === "A" ||
-        target.closest("button") ||
-        target.closest("a")
-      ) {
-        setIsHovered(true);
+    let raf;
+    const duration = 1250;
+    const t0 = performance.now();
+    const tick = (t) => {
+      const p = Math.min(1, (t - t0) / duration);
+      setCount(Math.round(p * 100));
+      if (p < 1) {
+        raf = requestAnimationFrame(tick);
       } else {
-        setIsHovered(false);
+        setTimeout(finish, 220);
       }
     };
-    window.addEventListener("mousemove", onMouseMove);
-    return () => window.removeEventListener("mousemove", onMouseMove);
+    raf = requestAnimationFrame(tick);
+    function onKey(event) {
+      if (event.key === "Escape") finish();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => {
+      cancelAnimationFrame(raf);
+      document.removeEventListener("keydown", onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  return (
+    <motion.div
+      className="loader"
+      onClick={finish}
+      role="status"
+      aria-label="Loading portfolio"
+      exit={{ y: "-100%" }}
+      transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+    >
+      <motion.div
+        className="loader-inner"
+        exit={{ opacity: 0, y: -30 }}
+        transition={{ duration: 0.35, ease: "easeIn" }}
+      >
+        <div className="loader-mark">
+          va<span>.</span>
+        </div>
+        <div className="loader-name">VISHAL AGRAWAL — PORTFOLIO</div>
+        <div className="loader-count">
+          {String(count).padStart(3, "0")} / 100
+        </div>
+        <div className="loader-bar">
+          <i style={{ transform: `scaleX(${count / 100})` }} />
+        </div>
+        <div className="loader-hint">CLICK ANYWHERE TO SKIP</div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
+/* ============================ cursor aura ============================ */
+
+function CursorAura() {
+  const ref = useRef(null);
+  const reduced = useReducedMotion();
+  const fine = useFinePointer();
+  useEffect(() => {
+    if (reduced || !fine || !ref.current) return;
+    const el = ref.current;
+    let x = -500;
+    let y = -500;
+    let tx = x;
+    let ty = y;
+    let raf;
+    let shown = false;
+    function onMove(event) {
+      tx = event.clientX;
+      ty = event.clientY;
+      if (!shown) {
+        shown = true;
+        el.classList.add("is-visible");
+      }
+    }
+    function loop() {
+      x += (tx - x) * 0.08;
+      y += (ty - y) * 0.08;
+      el.style.transform = `translate(${x}px, ${y}px)`;
+      raf = requestAnimationFrame(loop);
+    }
+    window.addEventListener("pointermove", onMove, { passive: true });
+    raf = requestAnimationFrame(loop);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      cancelAnimationFrame(raf);
+    };
+  }, [reduced, fine]);
+  if (reduced || !fine) return null;
+  return <div ref={ref} className="cursor-aura" aria-hidden="true" />;
+}
+
+/* ============================ theme toggle ============================ */
+
+function ThemeToggle({ theme, onToggle }) {
+  const dark = theme !== "light";
+  return (
+    <button
+      className="theme-toggle"
+      onClick={onToggle}
+      aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
+      aria-pressed={!dark}
+      title={dark ? "Light mode" : "Dark mode"}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={theme}
+          initial={{ rotate: -70, opacity: 0, scale: 0.6 }}
+          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+          exit={{ rotate: 70, opacity: 0, scale: 0.6 }}
+          transition={{ duration: 0.3, ease: EASE }}
+          style={{ display: "inline-flex" }}
+        >
+          {dark ? <Sun size={17} /> : <Moon size={17} />}
+        </motion.span>
+      </AnimatePresence>
+    </button>
+  );
+}
+
+/* ===================== local time + side rails ===================== */
+
+function LocalTime({ showSeconds = true }) {
+  const reduced = useReducedMotion();
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), reduced ? 30000 : 1000);
+    return () => clearInterval(id);
+  }, [reduced]);
+  const withSeconds = showSeconds && !reduced;
+  const formatted = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    ...(withSeconds ? { second: "2-digit" } : {}),
+    hour12: false,
+    timeZone: "Asia/Kolkata",
+  }).format(now);
+  return <>{formatted}</>;
+}
+
+function SideRails() {
+  const year = new Date().getFullYear();
   return (
     <>
-      <motion.div
-        className="cursor-dot"
-        animate={{
-          x: mousePosition.x - 4,
-          y: mousePosition.y - 4,
-          scale: isHovered ? 2.5 : 1,
-        }}
-        transition={{ type: "spring", stiffness: 800, damping: 35 }}
-      />
-      <motion.div
-        className="cursor-ring"
-        animate={{
-          x: mousePosition.x - 18,
-          y: mousePosition.y - 18,
-          scale: isHovered ? 1.4 : 1,
-          borderColor: isHovered ? "var(--accent)" : "var(--border-strong)"
-        }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      />
+      <span className="side-rail left" aria-hidden="true">
+        VISHAL AGRAWAL — PORTFOLIO © {year}
+      </span>
+      <span className="side-rail right" aria-hidden="true">
+        AI ENGINEER — NEW RAIPUR, IN
+      </span>
     </>
   );
 }
 
-/* =================================================================
-   VA BRAND MONOGRAM LOGO
-================================================================= */
+/* ========================= hero particle field ========================= */
 
-function VALogo({ size = 32, className = "" }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <rect width="40" height="40" rx="10" fill="var(--card-bg)" stroke="var(--border)" strokeWidth="1" />
-      <path d="M11 13L18.5 28H21.5L29 13" stroke="var(--accent)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M22.5 13L30 28" stroke="var(--text-dim)" strokeWidth="2.2" strokeLinecap="round" opacity="0.6" />
-    </svg>
-  );
+const FIELD_RGB = { dark: "185,217,176", light: "32,92,55" };
+
+function HeroField({ theme }) {
+  const ref = useRef(null);
+  const reduced = useReducedMotion();
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const rgb = FIELD_RGB[theme] || FIELD_RGB.dark;
+    let raf;
+    let running = true;
+    let points = [];
+    const mouse = { x: -9999, y: -9999 };
+    const parent = canvas.parentElement;
+
+    function seed() {
+      const rect = parent.getBoundingClientRect();
+      const dpr = Math.min(1.75, window.devicePixelRatio || 1);
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.max(
+        28,
+        Math.min(90, Math.floor((rect.width * rect.height) / 22000)),
+      );
+      points = Array.from({ length: count }, () => ({
+        x: Math.random() * rect.width,
+        y: Math.random() * rect.height,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+      }));
+    }
+
+    function draw() {
+      const rect = parent.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      for (const p of points) {
+        p.x += p.vx;
+        p.y += p.vy;
+        const dxm = mouse.x - p.x;
+        const dym = mouse.y - p.y;
+        const dm = Math.hypot(dxm, dym);
+        if (dm < 170 && dm > 1) {
+          p.x += (dxm / dm) * 0.5;
+          p.y += (dym / dm) * 0.5;
+        }
+        if (p.x < 0 || p.x > rect.width) p.vx *= -1;
+        if (p.y < 0 || p.y > rect.height) p.vy *= -1;
+        p.x = Math.max(0, Math.min(rect.width, p.x));
+        p.y = Math.max(0, Math.min(rect.height, p.y));
+      }
+      ctx.lineWidth = 1;
+      for (let i = 0; i < points.length; i++) {
+        for (let j = i + 1; j < points.length; j++) {
+          const a = points[i];
+          const b = points[j];
+          const d = Math.hypot(a.x - b.x, a.y - b.y);
+          if (d < 130) {
+            ctx.strokeStyle = `rgba(${rgb},${((1 - d / 130) * 0.32).toFixed(3)})`;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+      for (const p of points) {
+        ctx.fillStyle = `rgba(${rgb},0.75)`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function loop() {
+      if (!running) return;
+      draw();
+      raf = requestAnimationFrame(loop);
+    }
+
+    function onPointer(event) {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = event.clientX - rect.left;
+      mouse.y = event.clientY - rect.top;
+    }
+
+    seed();
+    if (reduced) {
+      draw();
+    } else {
+      loop();
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (reduced) return;
+        if (entry.isIntersecting && !running) {
+          running = true;
+          loop();
+        } else if (!entry.isIntersecting && running) {
+          running = false;
+          cancelAnimationFrame(raf);
+        }
+      },
+      { threshold: 0 },
+    );
+    observer.observe(canvas);
+    window.addEventListener("resize", seed);
+    window.addEventListener("pointermove", onPointer, { passive: true });
+    return () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+      window.removeEventListener("resize", seed);
+      window.removeEventListener("pointermove", onPointer);
+    };
+  }, [theme, reduced]);
+
+  return <canvas ref={ref} className="hero-field" aria-hidden="true" />;
 }
 
-/* =================================================================
-   MAIN PORTFOLIO COMPONENT
-================================================================= */
+/* ========================= neural sculpture ========================= */
 
-export default function Portfolio() {
-  const [theme, setTheme] = useState("dark");
-  const [roleIdx, setRoleIdx] = useState(0);
-  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
-  const [contactSent, setContactSent] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
-  const [paletteOpen, setPaletteOpen] = useState(false);
-  const [toastMsg, setToastMsg] = useState(null);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRoleIdx((prev) => (prev + 1) % ROLES.length);
-    }, 3200);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    function onKeyDown(e) {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setPaletteOpen((prev) => !prev);
-      }
-      if (e.key === "Escape") {
-        setPaletteOpen(false);
-      }
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-
-  const triggerToast = (msg) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3000);
-  };
-
-  const copyEmailToClipboard = () => {
-    navigator.clipboard?.writeText("agrawalvishal804@gmail.com");
-    triggerToast("Copied agrawalvishal804@gmail.com to clipboard");
-  };
-
-  const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handlePaletteSelect = (cmd) => {
-    setPaletteOpen(false);
-    if (cmd.action === "copy-email") {
-      copyEmailToClipboard();
-    } else if (cmd.action === "open-resume") {
-      window.open(SOCIAL_LINKS.resume, "_blank");
-    } else if (cmd.action === "toggle-theme") {
-      setTheme((t) => (t === "dark" ? "light" : "dark"));
-      triggerToast(`Switched theme to ${theme === "dark" ? "Light Mode" : "Dark Mode"}`);
-    } else if (cmd.action === "open-github") {
-      window.open(SOCIAL_LINKS.github, "_blank");
-    } else {
-      scrollToSection(cmd.id);
-    }
-  };
-
-  const handleContactSubmit = async (e) => {
-    e.preventDefault();
-    const { name, email, message } = contactForm;
-    triggerToast("Sending message to agrawalvishal804@gmail.com...");
-
-    try {
-      const response = await fetch("https://formsubmit.co/ajax/agrawalvishal804@gmail.com", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          message: message,
-          _subject: `Portfolio Message from ${name}`
-        })
-      });
-
-      if (response.ok) {
-        setContactSent(true);
-        triggerToast("Message sent successfully to agrawalvishal804@gmail.com!");
-        setContactForm({ name: "", email: "", message: "" });
-        return;
-      }
-    } catch (err) {
-      console.warn("FormSubmit fetch fallback to mailto", err);
-    }
-
-    // Fallback to pre-filled mailto directly to agrawalvishal804@gmail.com
-    const subject = encodeURIComponent(`Portfolio Message from ${name || "Visitor"}`);
-    const body = encodeURIComponent(`From: ${name} (${email})\n\nMessage:\n${message}`);
-    window.location.href = `mailto:agrawalvishal804@gmail.com?subject=${subject}&body=${body}`;
-    setContactSent(true);
-    triggerToast("Opening mail client...");
-  };
-
+function NeuralSculpture() {
+  const rings = Array.from({ length: 23 }, (_, i) => {
+    const latitude = (i / 22) * Math.PI;
+    const r = 157 * Math.sin(latitude);
+    return { cy: 250 + 157 * Math.cos(latitude), r };
+  });
   return (
-    <div className={`portfolio-root theme-${theme}`}>
-      <style>{CSS}</style>
-      <CustomCursor />
-
-      {/* TOAST NOTIFICATION */}
-      <AnimatePresence>
-        {toastMsg && <Toast message={toastMsg} />}
-      </AnimatePresence>
-
-      {/* COMMAND PALETTE */}
-      <CommandPalette
-        isOpen={paletteOpen}
-        onClose={() => setPaletteOpen(false)}
-        onSelect={handlePaletteSelect}
-      />
-
-      {/* SPLASH SCREEN */}
-      <AnimatePresence>
-        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-      </AnimatePresence>
-
-      {/* NAVBAR */}
-      <header className="navbar">
-        <div className="navbar-inner">
-          <button className="brand-btn" onClick={() => scrollToSection("hero")}>
-            <VALogo size={32} />
-            <div className="brand-text">
-              <span className="brand-name">Vishal Agrawal</span>
-            </div>
-          </button>
-
-          {/* LIVE STATUS PILL */}
-          <div className="live-status-pill" onClick={copyEmailToClipboard} title="Click to copy email">
-            <span className="status-dot-pulse" />
-            <span className="status-text">AVAILABLE FOR PRODUCTION AI ROLES</span>
-          </div>
-
-          <nav className="nav-links">
-            <button onClick={() => scrollToSection("expertise")}>Expertise</button>
-            <button onClick={() => scrollToSection("projects")}>Work</button>
-            <button onClick={() => scrollToSection("journey")}>Journey</button>
-            <button onClick={() => scrollToSection("contact")}>Contact</button>
-          </nav>
-
-          <div className="navbar-actions">
-            <button
-              className="icon-toggle"
-              onClick={() => setPaletteOpen(true)}
-              title="Command Palette (⌘K)"
-            >
-              <Search size={16} />
-            </button>
-            <button
-              className="icon-toggle"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              title="Toggle color theme"
-            >
-              {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
-            <a href={SOCIAL_LINKS.resume} target="_blank" rel="noreferrer" className="btn btn-nav">
-              <FileText size={15} /> Resume
-            </a>
-          </div>
-        </div>
-      </header>
-
-      {/* HERO SECTION */}
-      <section id="hero" className="hero-section">
-        <div className="hero-background-glow" />
-        <div className="hero-container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="hero-eyebrow"
+    <div className="neural-sculpture" aria-hidden="true">
+      <div className="orb-halo" />
+      <div className="sculpture-coordinate mono">FIG. 001 / LATENT SPACE</div>
+      <svg className="orbital-art" viewBox="0 0 520 520" fill="none">
+        <defs>
+          <radialGradient id="sphere-light">
+            <stop offset="0" className="orb-glow-stop" stopOpacity="0.12" />
+            <stop offset="1" className="orb-glow-stop" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient
+            id="orbit-stroke"
+            x1="50"
+            y1="70"
+            x2="450"
+            y2="440"
+            gradientUnits="userSpaceOnUse"
           >
-            <span>BUILDING PRODUCTION AI</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 45 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.95, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="hero-headline"
-          >
-            Engineering <br />
-            Intelligent <br />
-            <span className="text-gradient">AI Systems.</span>
-          </motion.h1>
-
-          <div className="hero-role-wrapper">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={roleIdx}
-                initial={{ opacity: 0, y: 14, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -14, scale: 0.95 }}
-                transition={{ duration: 0.38, ease: "easeOut" }}
-                className="hero-role-text"
-              >
-                {ROLES[roleIdx]}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="hero-subtext"
-          >
-            Architecting production LLM pipelines, voice-first multilingual AI models,
-            AST codebase intelligence, and real-time edge computer vision systems.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="hero-actions"
-          >
-            <MagneticButton className="btn btn-primary" onClick={() => scrollToSection("projects")}>
-              Explore Projects <ArrowRight size={16} />
-            </MagneticButton>
-            <MagneticButton className="btn btn-secondary" onClick={() => scrollToSection("contact")}>
-              Get in Touch
-            </MagneticButton>
-            <button className="btn btn-ghost" onClick={() => setPaletteOpen(true)}>
-              <Command size={15} /> Press ⌘K
-            </button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CORE EXPERTISE */}
-      <section id="expertise" className="section expertise-section">
-        <div className="section-container">
-          <div className="section-header">
-            <span className="section-eyebrow">CORE EXPERTISE</span>
-            <h2 className="section-title">Technical Domains & Capabilities</h2>
-            <p className="section-desc">
-              Core competencies spanning production Generative AI, deep learning, computer vision, and cloud infrastructure.
-            </p>
-          </div>
-
-          <div className="expertise-list">
-            {CORE_EXPERTISE.map((item, idx) => (
-              <motion.div
-                key={item.category}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.5, delay: idx * 0.08 }}
-                className="expertise-row"
-              >
-                <h3 className="expertise-category">{item.category}</h3>
-                <div className="expertise-skills">
-                  {item.skills.map((skill, sIdx) => (
-                    <span key={skill} className="expertise-skill-item">
-                      {skill}
-                      {sIdx < item.skills.length - 1 && <span className="expertise-bullet">•</span>}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PROJECTS SHOWCASE */}
-      <section id="projects" className="section projects-section">
-        <div className="section-container">
-          <div className="section-header">
-            <span className="section-eyebrow">FEATURED WORK</span>
-            <h2 className="section-title">Engineering Projects</h2>
-            <p className="section-desc">
-              Four production-focused systems engineered from zero to execution. Click any architecture stage below to inspect system details.
-            </p>
-          </div>
-
-          <div className="projects-list">
-            {FLAGSHIP_PROJECTS.map((project) => (
-              <TiltCard key={project.id} className="project-tilt-wrap">
-                <article id={project.id} className="project-product-page">
-                  {/* Project Header */}
-                  <div className="project-meta-row">
-                    <div className="project-number-badge">{project.number}</div>
-                    <div className="project-title-group">
-                      <h3 className="project-title">{project.title}</h3>
-                      <p className="project-tagline">{project.tagline}</p>
-                    </div>
-                    <div className="project-action-links">
-                      <a
-                        href={project.github}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="project-github-link"
-                        title="View Source on GitHub"
-                      >
-                        <Github size={16} /> Source <ArrowUpRight size={14} />
-                      </a>
-                      {project.id === "sanjeevani" || project.id === "careertrajectory" ? (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="project-action-link"
-                        >
-                          Live Demo <ExternalLink size={14} />
-                        </a>
-                      ) : (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="project-action-link"
-                        >
-                          Documentation <FileText size={14} />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Video / Visual Banner */}
-                  <div className="project-banner-container">
-                    <video
-                      className="project-banner-video"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      poster={project.poster}
-                    >
-                      <source src={project.videoPlaceholder} type="video/mp4" />
-                      Your browser does not support HTML5 video.
-                    </video>
-                    <div className="project-banner-overlay" />
-
-                    {/* Audio Waveform Visualizer for Sanjeevani */}
-                    {project.id === "sanjeevani" && (
-                      <div className="waveform-bar-wrap">
-                        <span className="waveform-label">Indic Speech Processing</span>
-                        <div className="waveform-bars">
-                          {[40, 70, 30, 90, 50, 80, 40, 100, 60, 30, 85].map((h, i) => (
-                            <span key={i} style={{ height: `${h}%`, animationDelay: `${i * 0.12}s` }} />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Storytelling Grid */}
-                  <div className="project-story-grid">
-                    {/* Problem & Solution */}
-                    <div className="story-block story-block--main">
-                      <div className="story-item">
-                        <span className="story-label">THE PROBLEM</span>
-                        <p className="story-text">{project.story.problem}</p>
-                      </div>
-                      <div className="story-item">
-                        <span className="story-label">THE SOLUTION</span>
-                        <p className="story-text">{project.story.solution}</p>
-                      </div>
-                    </div>
-
-                    {/* Interactive Architecture Inspector */}
-                    <div className="story-block story-block--architecture">
-                      <span className="story-label">SYSTEM ARCHITECTURE (INTERACTIVE)</span>
-                      <InteractiveArchitecturePipeline steps={project.story.architecture} />
-                    </div>
-
-                    {/* Engineering Challenge & Key Results */}
-                    <div className="story-block story-block--engineering">
-                      <div className="story-item">
-                        <span className="story-label">ENGINEERING CHALLENGE</span>
-                        <p className="story-text">{project.story.challenge}</p>
-                      </div>
-                      <div className="story-item">
-                        <span className="story-label">KEY RESULTS</span>
-                        <ul className="results-list">
-                          {project.story.results.map((res) => (
-                            <li key={res}>
-                              <CheckCircle2 size={15} className="text-accent" />
-                              <span>{res}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Tech Stack Footer */}
-                  <div className="project-tech-footer">
-                    <span className="tech-footer-label">ENGINEERING STACK:</span>
-                    <div className="tech-pills">
-                      {project.story.techStack.map((tech) => (
-                        <span key={tech} className="tech-pill">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </article>
-              </TiltCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* UPCOMING PROJECTS SECTION */}
-      <section id="upcoming" className="section upcoming-section">
-        <div className="section-container">
-          <div className="section-header">
-            <span className="section-eyebrow">ACTIVE R&D & IN DEVELOPMENT</span>
-            <h2 className="section-title">Upcoming Projects</h2>
-            <p className="section-desc">
-              Projects I'm currently building and researching in trading intelligence, agentic workflows, and system architecture.
-            </p>
-          </div>
-
-          <div className="upcoming-grid">
-            {UPCOMING_PROJECTS.map((proj, idx) => (
-              <TiltCard key={proj.id} className="upcoming-tilt-wrap">
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.5, delay: idx * 0.15 }}
-                  className="upcoming-card"
-                >
-                  <div className="upcoming-card-header">
-                    <span className="upcoming-badge" style={{ borderColor: proj.accent, color: proj.accent }}>
-                      <span className="status-dot-pulse" style={{ background: proj.accent }} />
-                      {proj.status}
-                    </span>
-                  </div>
-
-                  <h3 className="upcoming-title">{proj.title}</h3>
-                  <p className="upcoming-subtitle">{proj.subtitle}</p>
-                  <p className="upcoming-desc">{proj.desc}</p>
-
-                  <div className="upcoming-tech-pills">
-                    {proj.tech.map((t) => (
-                      <span key={t} className="upcoming-tech-pill">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              </TiltCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* MINIMAL JOURNEY SECTION */}
-      <section id="journey" className="section journey-section">
-        <div className="section-container">
-          <div className="section-header">
-            <span className="section-eyebrow">MILESTONES</span>
-            <h2 className="section-title">The Journey So Far</h2>
-            <p className="section-desc">
-              Academic foundation, industry fellowships, and problem-solving benchmarks.
-            </p>
-          </div>
-
-          <div className="journey-list">
-            {JOURNEY_MILESTONES.map((item) => (
-              <TiltCard key={item.org} className="journey-tilt-wrap">
-                <div className="journey-item">
-                  <div className="journey-meta">
-                    <span className="journey-org">{item.org}</span>
-                    <span className="journey-period">{item.period}</span>
-                  </div>
-                  <div className="journey-content">
-                    <h3 className="journey-role">{item.role}</h3>
-                    <p className="journey-desc">{item.desc}</p>
-                  </div>
-                </div>
-              </TiltCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CONTACT & GET IN TOUCH */}
-      <section id="contact" className="section contact-section">
-        <div className="section-container">
-          <div className="contact-grid">
-            <div className="contact-info">
-              <span className="section-eyebrow">GET IN TOUCH</span>
-              <h2 className="contact-title">Let's build something intelligent.</h2>
-              <p className="contact-desc">
-                Open for AI Engineering roles, research collaborations, and production systems engineering.
-              </p>
-
-              <div className="contact-details">
-                <button onClick={copyEmailToClipboard} className="contact-detail-item contact-detail-btn">
-                  <Mail size={18} /> agrawalvishal804@gmail.com <Copy size={14} className="copy-icon" />
-                </button>
-                <div className="contact-detail-item">
-                  <Compass size={18} /> IIIT Naya Raipur, India
-                </div>
-              </div>
-
-              <div className="social-links">
-                <a href={SOCIAL_LINKS.github} target="_blank" rel="noreferrer" className="social-btn">
-                  <Github size={18} />
-                </a>
-                <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noreferrer" className="social-btn">
-                  <Linkedin size={18} />
-                </a>
-                <a href={SOCIAL_LINKS.twitter} target="_blank" rel="noreferrer" className="social-btn">
-                  <Twitter size={18} />
-                </a>
-              </div>
-            </div>
-
-            <div className="contact-form-container">
-              <form onSubmit={handleContactSubmit} className="contact-form">
-                <div className="form-group">
-                  <label htmlFor="name">Name</label>
-                  <input
-                    id="name"
-                    type="text"
-                    required
-                    placeholder="Your name"
-                    value={contactForm.name}
-                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    placeholder="you@example.com"
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="message">Message</label>
-                  <textarea
-                    id="message"
-                    rows={4}
-                    required
-                    placeholder="Tell me about your project or opportunity..."
-                    value={contactForm.message}
-                    onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary btn-full">
-                  Send Message <Send size={15} />
-                </button>
-                {contactSent && (
-                  <p className="contact-success-msg">
-                    <CheckCircle2 size={15} /> Message sent directly to agrawalvishal804@gmail.com!
-                  </p>
-                )}
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="footer">
-        <div className="footer-container">
-          <div className="footer-brand">
-            <VALogo size={28} />
-            <span>Vishal Agrawal</span>
-          </div>
-          <p className="footer-copy">
-            © {new Date().getFullYear()} Vishal Agrawal. Engineered with intent.
-          </p>
-          <div className="footer-links">
-            <a href={SOCIAL_LINKS.github} target="_blank" rel="noreferrer">GitHub</a>
-            <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
-            <a href={SOCIAL_LINKS.twitter} target="_blank" rel="noreferrer">Twitter</a>
-          </div>
-        </div>
-      </footer>
+            <stop offset="0" className="orb-stroke-stop" stopOpacity="0.85" />
+            <stop
+              offset="0.48"
+              className="orb-stroke-stop"
+              stopOpacity="0.18"
+            />
+            <stop offset="1" className="orb-stroke-stop" stopOpacity="0.7" />
+          </linearGradient>
+          <style>
+            {`.orb-glow-stop{stop-color:var(--accent)}.orb-stroke-stop{stop-color:var(--accent)}.orb-ring{stroke:var(--viz-dim)}.orb-faint{stroke:var(--viz-faint)}.orb-dot{fill:var(--accent)}.orb-cross{stroke:var(--viz-faint)}`}
+          </style>
+        </defs>
+        <path
+          d="M260 30V490M30 250H490"
+          className="orb-faint"
+          strokeOpacity="0.35"
+          strokeDasharray="2 7"
+        />
+        <circle
+          cx="260"
+          cy="250"
+          r="209"
+          className="orb-faint"
+          strokeOpacity="0.3"
+        />
+        <circle cx="260" cy="250" r="190" fill="url(#sphere-light)" />
+        <g
+          className="orb-ring"
+          stroke="url(#orbit-stroke)"
+          strokeWidth="0.9"
+          transform="rotate(-28 260 250)"
+        >
+          {rings.map((ring, i) => (
+            <ellipse
+              key={i}
+              cx="260"
+              cy={ring.cy}
+              rx={ring.r}
+              ry={ring.r * 0.25}
+            />
+          ))}
+          {Array.from({ length: 11 }, (_, i) => (
+            <ellipse
+              key={`v${i}`}
+              cx="260"
+              cy="250"
+              rx={16 + i * 14}
+              ry="157"
+            />
+          ))}
+        </g>
+        <g transform="rotate(-28 260 250)">
+          <ellipse
+            cx="260"
+            cy="250"
+            rx="242"
+            ry="64"
+            stroke="url(#orbit-stroke)"
+            strokeWidth="1"
+          />
+          <ellipse
+            cx="260"
+            cy="250"
+            rx="218"
+            ry="79"
+            className="orb-ring"
+            strokeOpacity="0.5"
+          />
+          <circle cx="502" cy="250" r="3" className="orb-dot" />
+        </g>
+        <g className="orbit-traveler">
+          <circle cx="260" cy="41" r="3" className="orb-dot" />
+          <circle
+            cx="260"
+            cy="41"
+            r="9"
+            className="orb-ring"
+            strokeOpacity="0.5"
+          />
+        </g>
+        <path
+          d="M84 85h8m-4-4v8M422 422h8m-4-4v8"
+          className="orb-cross"
+          strokeOpacity="0.8"
+        />
+      </svg>
+      <div className="sculpture-caption mono">
+        <span>FROM COMPLEXITY</span>
+        <span>
+          TO INTELLIGENCE <ArrowUpRight size={12} />
+        </span>
+      </div>
     </div>
   );
 }
 
-/* =================================================================
-   CSS STYLESHEET (SINGLE Unified Warm Amber & Obsidian System)
-================================================================= */
-
-const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
-html, body, #root {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  background-color: #09090b !important;
-  overflow-x: hidden;
-}
-
-/* -------- COLOR SYSTEM TOKENS -------- */
-.portfolio-root {
-  --bg: #09090b;
-  --bg-elevated: #121215;
-  --card-bg: #16161a;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --text: #fafafa;
-  --text-muted: #a1a1aa;
-  --text-dim: #71717a;
-  --accent: #f59e0b;
-  --accent-soft: rgba(245, 158, 11, 0.12);
-  --accent-glow: rgba(245, 158, 11, 0.25);
-  
-  background-color: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
-
-.portfolio-root.theme-light {
-  --bg: #faf9f6;
-  --bg-elevated: #ffffff;
-  --card-bg: #ffffff;
-  --border: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.18);
-  --text: #18181b;
-  --text-muted: #52525b;
-  --text-dim: #a1a1aa;
-  --accent: #d97706;
-  --accent-soft: rgba(217, 119, 6, 0.1);
-  --accent-glow: rgba(217, 119, 6, 0.18);
-}
-
-.portfolio-root * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* -------- 3D TILT WRAPPERS -------- */
-.philosophy-card-tilt-wrap, .project-tilt-wrap, .journey-tilt-wrap {
-  width: 100%;
-  transform-style: preserve-3d;
-}
-
-/* -------- TOAST NOTIFICATION -------- */
-.toast-container {
-  position: fixed;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10001;
-  background: var(--bg-elevated);
-  border: 1px solid var(--accent);
-  color: var(--text);
-  padding: 10px 20px;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13.5px;
-  font-weight: 500;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-.toast-icon { color: var(--accent); }
-
-/* -------- COMMAND PALETTE -------- */
-.palette-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(12px);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 15vh;
-}
-
-.palette-modal {
-  width: 100%;
-  max-width: 600px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
-}
-
-.palette-search-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-.palette-search-icon { color: var(--accent); }
-
-.palette-search-bar input {
-  flex: 1;
-  background: none;
-  border: none;
-  outline: none;
-  font-size: 15px;
-  color: var(--text);
-  font-family: inherit;
-}
-
-.palette-kbd {
-  font-size: 11px;
-  font-weight: 700;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  padding: 3px 8px;
-  border-radius: 6px;
-  color: var(--text-dim);
-}
-
-.palette-list {
-  max-height: 340px;
-  overflow-y: auto;
-  padding: 8px;
-}
-
-.palette-empty {
-  padding: 24px;
-  text-align: center;
-  color: var(--text-dim);
-  font-size: 14px;
-}
-
-.palette-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: none;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-  transition: background 0.15s;
-  text-align: left;
-}
-
-.palette-item:hover {
-  background: var(--accent-soft);
-}
-
-.palette-item-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.palette-item-cat {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--accent);
-  background: var(--card-bg);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.palette-item-label {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.palette-item-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.palette-item-hint {
-  font-size: 12px;
-  color: var(--text-dim);
-}
-
-.palette-enter-icon {
-  color: var(--text-dim);
-  opacity: 0.6;
-}
-
-.palette-footer {
-  padding: 12px 20px;
-  border-top: 1px solid var(--border);
-  background: var(--card-bg);
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-dim);
-}
-
-.palette-footer kbd {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: var(--accent);
-}
-
-/* -------- LIVE STATUS PILL IN NAVBAR -------- */
-.live-status-pill {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent);
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.live-status-pill:hover {
-  transform: scale(1.03);
-}
-
-.status-dot-pulse {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 10px #10b981;
-  animation: pulseDot 1.8s infinite;
-}
-
-@keyframes pulseDot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.6; }
-}
-
-.status-text {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-}
-
-@media (max-width: 1024px) {
-  .live-status-pill { display: none; }
-}
-
-/* -------- SPLASH SCREEN OPENING ANIMATION -------- */
-.splash-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  perspective: 1200px;
-}
-
-.splash-ambient-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  height: 350px;
-  background: radial-gradient(ellipse at center, var(--accent-soft), transparent 70%);
-  pointer-events: none;
-  opacity: 0.8;
-}
-
-.splash-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  text-align: center;
-  padding: 24px;
-  position: relative;
-  z-index: 2;
-}
-
-.splash-logo-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  filter: drop-shadow(0 0 40px var(--accent-glow));
-}
-
-.splash-name {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(28px, 5.5vw, 52px);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--text);
-  overflow: hidden;
-}
-
-.splash-letter {
-  display: inline-block;
-  transform-origin: center bottom;
-  text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
-}
-
-.splash-slogan {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  color: var(--accent);
-  text-transform: uppercase;
-}
-
-.slogan-text-glow {
-  text-shadow: 0 0 10px var(--accent-glow);
-}
-
-.splash-slogan-line {
-  width: 36px;
-  height: 1px;
-  background: var(--accent);
-  opacity: 0.6;
-}
-
-.splash-progress-track {
-  width: 240px;
-  height: 2px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 14px;
-}
-
-.splash-progress-bar {
-  height: 100%;
-  background: var(--accent);
-  box-shadow: 0 0 16px var(--accent);
-}
-
-/* -------- CURSOR -------- */
-.cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 8px;
-  background: var(--accent);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border-strong);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-}
-
-@media (hover: none) {
-  .cursor-dot, .cursor-ring { display: none; }
-}
-
-/* -------- NAVBAR -------- */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: rgba(9, 9, 11, 0.75);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.3s;
-}
-.theme-light .navbar {
-  background: rgba(250, 249, 246, 0.8);
-}
-
-.navbar-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.brand-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: inherit;
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.brand-name {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: -0.02em;
-}
-
-.brand-sub {
-  font-size: 11px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.nav-links {
-  display: flex;
-  gap: 28px;
-}
-
-.nav-links button {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.nav-links button:hover {
-  color: var(--text);
-}
-
-.navbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.icon-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.icon-toggle:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-/* -------- BUTTONS -------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.25s ease;
-  border: 1px solid transparent;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: #000000;
-  box-shadow: 0 4px 20px var(--accent-glow);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px var(--accent-glow);
-}
-
-.btn-secondary {
-  background: var(--bg-elevated);
-  border-color: var(--border-strong);
-  color: var(--text);
-}
-
-.btn-secondary:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-
-.btn-ghost {
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-}
-
-.btn-ghost:hover {
-  color: var(--text);
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.btn-nav {
-  padding: 8px 16px;
-  font-size: 13px;
-  background: var(--bg-elevated);
-  border-color: var(--border);
-  color: var(--text);
-}
-
-.btn-nav:hover {
-  border-color: var(--accent);
-}
-
-.btn-full {
-  width: 100%;
-  justify-content: center;
-}
-
-/* -------- HERO SECTION -------- */
-.hero-section {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 140px 24px 80px;
-}
-
-.hero-background-glow {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px;
-  height: 400px;
-  background: radial-gradient(ellipse at center, var(--accent-soft), transparent 70%);
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.hero-container {
-  max-width: 900px;
-  margin: 0 auto;
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
-
-.hero-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  color: var(--accent);
-  margin-bottom: 24px;
-}
-
-.eyebrow-divider {
-  opacity: 0.4;
-}
-
-.hero-headline {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(42px, 7.5vw, 84px);
-  line-height: 1.05;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  margin-bottom: 24px;
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, var(--text) 30%, var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.hero-role-wrapper {
-  height: 36px;
-  margin-bottom: 24px;
-  display: flex;
-  justify-content: center;
-}
-
-.hero-role-text {
-  font-size: clamp(18px, 2.5vw, 24px);
-  color: var(--text-muted);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-.hero-subtext {
-  font-size: 17px;
-  line-height: 1.65;
-  color: var(--text-muted);
-  max-width: 640px;
-  margin: 0 auto 40px;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-/* -------- SECTIONS & LAYOUT -------- */
-.section {
-  padding: 60px 24px;
-}
-
-.section-container {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.section-header {
-  margin-bottom: 36px;
-  text-align: left;
-}
-
-.section-eyebrow {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--accent);
-  display: block;
-  margin-bottom: 12px;
-}
-
-.section-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(32px, 4.5vw, 48px);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  margin-bottom: 16px;
-}
-
-.section-desc {
-  font-size: 17px;
-  color: var(--text-muted);
-  max-width: 620px;
-  line-height: 1.6;
-}
-
-/* -------- CORE EXPERTISE SECTION -------- */
-.expertise-list {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--border);
-}
-
-.expertise-row {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  align-items: center;
-  gap: 32px;
-  padding: 32px 16px;
-  border-bottom: 1px solid var(--border);
-  border-radius: 8px;
-  transition: background 0.25s, padding-left 0.25s;
-}
-
-.expertise-row:hover {
-  background: var(--accent-soft);
-  padding-left: 24px;
-}
-
-.expertise-category {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.02em;
-}
-
-.expertise-skills {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 14px;
-}
-
-.expertise-skill-item {
-  font-size: 16px;
-  color: var(--text-muted);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  transition: color 0.2s;
-}
-
-.expertise-row:hover .expertise-skill-item {
-  color: var(--text);
-}
-
-.expertise-bullet {
-  color: var(--accent);
-  opacity: 0.6;
-  font-size: 12px;
-}
-
-@media (max-width: 768px) {
-  .expertise-row {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 24px 8px;
+/* ========================= project visuals ========================= */
+
+function ProjectVisual({ kind }) {
+  if (kind === "sanjeevani")
+    return (
+      <div
+        className="project-visual voice-visual"
+        aria-label="Conceptual visualization of Sanjeevani's voice-to-triage pipeline"
+      >
+        <div className="visual-topline mono">
+          <span>
+            <span className="tiny-cross">+</span> SANJEEVANI / VOICE
+            INTELLIGENCE
+          </span>
+          <span>PIPELINE STUDY</span>
+        </div>
+        <div className="voice-center">
+          <span className="mono">MANY LANGUAGES. ONE POINT OF CARE.</span>
+          <div className="waveform" aria-hidden="true">
+            {Array.from({ length: 73 }, (_, i) => (
+              <i
+                key={i}
+                style={{
+                  "--bar-height": `${12 + Math.abs(Math.sin(i * 1.8) * Math.sin(i * 0.14)) * 105}px`,
+                  "--delay": `${i * -0.085}s`,
+                }}
+              />
+            ))}
+          </div>
+          <div className="voice-label">
+            <span className="status-dot pulse" />
+            Voice in. Understanding out.
+          </div>
+        </div>
+        <div className="pipeline mono">
+          <span>Speech</span>
+          <ArrowRight size={13} />
+          <span>Translation</span>
+          <ArrowRight size={13} />
+          <span>Retrieval</span>
+          <ArrowRight size={13} />
+          <span className="accent">Triage</span>
+        </div>
+        <div className="visual-sheen" aria-hidden="true" />
+      </div>
+    );
+  if (kind === "codrix")
+    return (
+      <div
+        className="project-visual code-visual"
+        aria-label="Conceptual visualization of Codrix's source-to-knowledge-graph architecture"
+      >
+        <div className="visual-topline mono">
+          <span>CODRIX.AI / REPOSITORY INTELLIGENCE</span>
+          <span>ARCHITECTURE STUDY</span>
+        </div>
+        <div className="code-composition">
+          <div className="code-snippet">
+            <span className="code-file">source / pipeline.py</span>
+            <div>
+              <b>01</b> <em>def</em> understand(repo):
+            </div>
+            <div>
+              <b>02</b> &nbsp; tree = parse(repo)
+            </div>
+            <div>
+              <b>03</b> &nbsp; graph = map(tree)
+            </div>
+            <div>
+              <b>04</b> &nbsp; <em>return</em> query(graph)
+            </div>
+            <span className="code-comment">// structure becomes context</span>
+          </div>
+          <svg
+            className="code-graph"
+            viewBox="0 0 300 235"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              className="edge"
+              d="M48 118L145 45L254 85M48 118L151 130L254 85M151 130L241 192M48 118L116 202L241 192M145 45L151 130L116 202"
+            />
+            {[
+              [48, 118],
+              [145, 45],
+              [254, 85],
+              [151, 130],
+              [241, 192],
+              [116, 202],
+            ].map(([x, y], i) => (
+              <g key={i} className={i === 3 ? "node-pulse" : undefined}>
+                <circle
+                  cx={x}
+                  cy={y}
+                  r={i === 3 ? 19 : 10}
+                  className={i === 3 ? "node node-core" : "node"}
+                  strokeWidth={i === 3 ? 1.5 : 1}
+                />
+                <circle cx={x} cy={y} r="3" className="dot" />
+              </g>
+            ))}
+            <text x="167" y="40">
+              AST
+            </text>
+            <text x="176" y="132">
+              symbol
+            </text>
+            <text x="125" y="225">
+              dependency
+            </text>
+          </svg>
+        </div>
+        <div className="visual-bottom mono">
+          <span>PARSE. CONNECT. UNDERSTAND.</span>
+          <span>Tree-sitter / FAISS / LangChain</span>
+        </div>
+        <div className="visual-sheen" aria-hidden="true" />
+      </div>
+    );
+  if (kind === "careertrajectory")
+    return (
+      <div
+        className="project-visual talent-visual"
+        aria-label="Conceptual multi-agent talent analysis diagram"
+      >
+        <div className="visual-topline mono">
+          <span>MULTI-AGENT ANALYSIS</span>
+          <span>03</span>
+        </div>
+        <div className="talent-diagram">
+          <div className="talent-input">
+            Candidate
+            <br />
+            <span className="quiet">beyond the keywords</span>
+          </div>
+          <div className="agent-lines">
+            {["Skills & depth", "Learning trajectory", "Project evidence"].map(
+              (label, i) => (
+                <div key={label}>
+                  <span className="mono">0{i + 1}</span>
+                  <span>{label}</span>
+                  <ArrowUpRight size={15} />
+                </div>
+              ),
+            )}
+          </div>
+        </div>
+        <div className="visual-bottom mono">
+          EVIDENCE IN. EXPLAINABLE INSIGHT OUT.
+        </div>
+        <div className="visual-sheen" aria-hidden="true" />
+      </div>
+    );
+  return (
+    <div
+      className="project-visual field-visual"
+      aria-label="Conceptual orthomosaic patch tiling visualization, not actual field data"
+    >
+      <div className="visual-topline mono">
+        <span>ORTHOMOSAIC / PATCH ANALYSIS</span>
+        <span>04</span>
+      </div>
+      <div className="field-grid" aria-hidden="true">
+        {Array.from({ length: 84 }, (_, i) => (
+          <i
+            key={i}
+            style={{ "--tile-opacity": 0.12 + ((i * 17 + 3) % 13) / 24 }}
+          />
+        ))}
+        <div className="field-focus">
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+      </div>
+      <div className="visual-bottom mono">
+        <span>RESTORE / CLASSIFY / MAP</span>
+        <span>CONCEPT STUDY</span>
+      </div>
+      <div className="visual-sheen" aria-hidden="true" />
+    </div>
+  );
+}
+
+/* ============================ stat ============================ */
+
+function Stat({
+  prefix = "",
+  value,
+  decimals = 0,
+  suffix = "",
+  label,
+  started,
+}) {
+  const display = useCountUp(value, { decimals, started });
+  return (
+    <div className="stat">
+      <div className="stat-value">
+        {prefix}
+        {display}
+        <em>{suffix}</em>
+      </div>
+      <div className="stat-label">{label}</div>
+    </div>
+  );
+}
+
+/* ========================= project cards ========================= */
+
+function FeaturedProject({ project, index, onOpen, spotlight = false }) {
+  const heading = (
+    <>
+      <p className="eyebrow">
+        <span className="section-index">{project.number} /</span>
+        {project.category}
+      </p>
+      <h3>
+        <button onClick={() => onOpen(project)}>
+          {project.title}
+          <ArrowUpRight />
+        </button>
+      </h3>
+      <p className="project-tagline">{project.tagline}</p>
+      <p className="project-description">{project.summary}</p>
+    </>
+  );
+  const chips = (
+    <div className="chip-row">
+      {project.story.techStack.slice(0, 4).map((tech) => (
+        <span className="stack-chip" key={tech}>
+          {tech}
+        </span>
+      ))}
+    </div>
+  );
+  const outcomes = (
+    <ul className="result-list">
+      {project.story.results.map((result) => (
+        <li key={result}>
+          <Check size={15} />
+          {result}
+        </li>
+      ))}
+    </ul>
+  );
+  const award =
+    project.id === "sanjeevani" ? (
+      <div className="project-note">
+        <span className="tiny-cross">+</span> 1st Place / AI Durg &amp; Gemma 4
+        Hackathon
+      </div>
+    ) : null;
+  const openLink = (
+    <div>
+      <button className="text-link" onClick={() => onOpen(project)}>
+        Inside the project
+        <ArrowUpRight size={16} />
+      </button>
+    </div>
+  );
+  return (
+    <Reveal>
+      <TiltCard
+        className={`featured-project ${index === 1 ? "project-reverse" : ""}${spotlight ? " spotlight" : ""}`}
+      >
+        <div className="visual-col">
+          <button
+            className="visual-button"
+            onClick={() => onOpen(project)}
+            aria-label={`Explore ${project.title} case study`}
+          >
+            <ProjectVisual kind={project.id} />
+            <span className="visual-open">
+              View case <ArrowUpRight size={14} />
+            </span>
+          </button>
+        </div>
+        {spotlight ? (
+          <div className="project-copy spotlight-copy">
+            <div className="spotlight-main">
+              {heading}
+              {award}
+            </div>
+            <div className="spotlight-side">
+              <p className="mono side-label">Stack</p>
+              {chips}
+              <p className="mono side-label">Outcomes</p>
+              {outcomes}
+              {openLink}
+            </div>
+          </div>
+        ) : (
+          <div className="project-copy">
+            {heading}
+            {chips}
+            {outcomes}
+            {award}
+            {openLink}
+          </div>
+        )}
+      </TiltCard>
+    </Reveal>
+  );
+}
+
+function SupportingProject({ project, onOpen }) {
+  return (
+    <Reveal>
+      <TiltCard className="supporting-project" max={3}>
+        <div>
+          <button
+            className="visual-button"
+            onClick={() => onOpen(project)}
+            aria-label={`Explore ${project.title} case study`}
+          >
+            <ProjectVisual kind={project.id} />
+            <span className="visual-open">
+              View case <ArrowUpRight size={14} />
+            </span>
+          </button>
+          <div className="supporting-title">
+            <div>
+              <p className="eyebrow">
+                <span className="section-index">{project.number} /</span>
+                {project.category}
+              </p>
+              <h3>
+                <button onClick={() => onOpen(project)}>{project.title}</button>
+              </h3>
+            </div>
+            <button
+              className="icon-button"
+              onClick={() => onOpen(project)}
+              aria-label={`Read ${project.title} case study`}
+            >
+              <ArrowUpRight size={19} />
+            </button>
+          </div>
+          <p
+            className="project-tagline"
+            style={{ fontSize: "14.5px", marginTop: "6px" }}
+          >
+            {project.tagline}
+          </p>
+          <p className="project-description">{project.summary}</p>
+          <p className="supporting-highlight">{project.story.results[0]}</p>
+          <div className="chip-row">
+            {project.story.techStack.slice(0, 4).map((tech) => (
+              <span className="stack-chip" key={tech}>
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+      </TiltCard>
+    </Reveal>
+  );
+}
+
+/* ========================= case study ========================= */
+
+function CaseStudy({ project, onClose }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (project && !dialog.open) {
+      dialog.showModal();
+      dialog.scrollTop = 0;
+    }
+    if (!project && dialog.open) dialog.close();
+  }, [project]);
+  return (
+    <dialog
+      ref={ref}
+      className="case-dialog"
+      onClose={onClose}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+      aria-labelledby="case-title"
+    >
+      {project && (
+        <div className="case-content">
+          <div className="case-header">
+            <span className="eyebrow">CASE STUDY / {project.number}</span>
+            <button
+              className="icon-button"
+              onClick={onClose}
+              aria-label="Close case study"
+              autoFocus
+            >
+              <X size={20} />
+            </button>
+          </div>
+          <p className="eyebrow accent">{project.category}</p>
+          <h2 id="case-title">{project.title}</h2>
+          <p className="case-tagline">{project.tagline}</p>
+          <ProjectVisual kind={project.id} />
+          <div className="case-story">
+            <section>
+              <h3>The problem</h3>
+              <p>{project.story.problem}</p>
+            </section>
+            <section>
+              <h3>The approach</h3>
+              <p>{project.story.solution}</p>
+            </section>
+          </div>
+          <section className="case-architecture">
+            <h3>Inside the architecture</h3>
+            {project.story.architecture.map((step, i) => (
+              <div key={step.stage}>
+                <span className="mono quiet">0{i + 1}</span>
+                <div>
+                  <h4>
+                    {step.stage} <span>{step.tech}</span>
+                  </h4>
+                  <p>{step.detail}</p>
+                </div>
+              </div>
+            ))}
+          </section>
+          <section className="case-challenge">
+            <h3>The engineering challenge</h3>
+            <p>{project.story.challenge}</p>
+          </section>
+          <section className="case-results">
+            <h3>Project outcomes</h3>
+            <ul>
+              {project.story.results.map((result) => (
+                <li key={result}>
+                  <Check size={16} />
+                  {result}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <div className="chip-row">
+            {project.story.techStack.map((tech) => (
+              <span className="stack-chip" key={tech}>
+                {tech}
+              </span>
+            ))}
+          </div>
+          <a
+            className="button button-primary"
+            href={project.github}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {project.id === "sanjeevani"
+              ? "Explore the source"
+              : "Visit GitHub profile"}
+            <ArrowUpRight size={17} />
+          </a>
+        </div>
+      )}
+    </dialog>
+  );
+}
+
+/* ========================= contact form ========================= */
+
+function ContactForm({ notify }) {
+  const [status, setStatus] = useState("idle");
+  const controller = useRef(null);
+  useEffect(() => () => controller.current?.abort(), []);
+  async function submit(event) {
+    event.preventDefault();
+    if (status === "sending") return;
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    setStatus("sending");
+    controller.current = new AbortController();
+    const timeout = setTimeout(() => controller.current.abort(), 15000);
+    try {
+      const response = await fetch(`https://formsubmit.co/ajax/${EMAIL}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: data.get("name"),
+          email: data.get("email"),
+          message: data.get("message"),
+          _subject: "Portfolio inquiry",
+          _honey: data.get("_honey"),
+        }),
+        signal: controller.current.signal,
+      });
+      const result = await response.json();
+      if (
+        !response.ok ||
+        (result.success !== true && result.success !== "true")
+      )
+        throw new Error("Submission failed");
+      setStatus("success");
+      form.reset();
+      notify("Message sent — I'll get back to you soon.");
+    } catch {
+      setStatus("error");
+    } finally {
+      clearTimeout(timeout);
+    }
   }
+  return (
+    <div className="contact-form-card">
+      <h3>Send a message</h3>
+      <p>Currently open to AI engineering roles and research collaborations.</p>
+      <form onSubmit={submit}>
+        <div className="form-fields">
+          <label>
+            Your name
+            <input
+              name="name"
+              autoComplete="name"
+              placeholder="Jane Sharma"
+              required
+              maxLength={120}
+            />
+          </label>
+          <label>
+            Email address
+            <input
+              type="email"
+              name="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              required
+              maxLength={254}
+            />
+          </label>
+        </div>
+        <label>
+          What&apos;s on your mind?
+          <textarea
+            name="message"
+            rows={4}
+            placeholder="A role, a research question, or something worth building."
+            required
+            maxLength={5000}
+          />
+        </label>
+        <input
+          className="honeypot"
+          name="_honey"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
+        <div className="form-bottom">
+          <button
+            className="button button-primary"
+            disabled={status === "sending"}
+          >
+            {status === "sending" ? "Sending..." : "Send message"}
+            <Send size={15} />
+          </button>
+          <p
+            className={`form-status${status === "success" ? " is-success" : status === "error" ? " is-error" : ""}`}
+            role="status"
+          >
+            {status === "success"
+              ? "Delivered. Thank you for reaching out."
+              : status === "error"
+                ? "Unable to send. Please use the email link or try again."
+                : "Delivered via FormSubmit."}
+          </p>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ============================== portfolio ============================== */
+
+const heroParent = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.3 } },
+};
+const heroChild = {
+  hidden: { opacity: 0, y: 36, filter: "blur(8px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.85, ease: EASE },
+  },
+};
+
+export default function Portfolio() {
+  const prefersReduced = useReducedMotion();
+  const [theme, baseToggleTheme] = useTheme();
+  function toggleTheme() {
+    if (prefersReduced) {
+      baseToggleTheme();
+      return;
+    }
+    document.documentElement.classList.add("theming");
+    baseToggleTheme();
+    setTimeout(() => document.documentElement.classList.remove("theming"), 650);
+  }
+  const [loading, setLoading] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("top");
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [toast, setToast] = useState("");
+  const [roleIndex, setRoleIndex] = useState(0);
+  const menuButton = useRef(null);
+  const toastTimer = useRef(null);
+  const copyTimer = useRef(null);
+  const statsRef = useRef(null);
+  const scrolled = useScrolled(16);
+  const ready = !loading;
+
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 90, damping: 24 });
+  const { scrollY } = useScroll();
+  const orbY = useTransform(scrollY, [0, 700], [0, 90]);
+  const ghostY = useTransform(scrollY, [0, 700], [0, 150]);
+  const ghostOpacity = useTransform(scrollY, [0, 550], [0.45, 0]);
+
+  /* hero depth parallax — cursor layers the composition (fine pointers) */
+  const heroMx = useMotionValue(0);
+  const heroMy = useMotionValue(0);
+  const heroSx = useSpring(heroMx, { stiffness: 55, damping: 18 });
+  const heroSy = useSpring(heroMy, { stiffness: 55, damping: 18 });
+  const ghostMouseX = useTransform(heroSx, [-0.5, 0.5], [-22, 22]);
+  const ghostMouseY = useTransform(heroSy, [-0.5, 0.5], [-12, 12]);
+  const orbMouseX = useTransform(heroSx, [-0.5, 0.5], [12, -12]);
+  const orbMouseY = useTransform(heroSy, [-0.5, 0.5], [9, -9]);
+  function onHeroPointerMove(event) {
+    if (prefersReduced || event.pointerType !== "mouse") return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    heroMx.set((event.clientX - rect.left) / rect.width - 0.5);
+    heroMy.set((event.clientY - rect.top) / rect.height - 0.5);
+  }
+  function onHeroPointerLeave() {
+    heroMx.set(0);
+    heroMy.set(0);
+  }
+  const statsInView = useInView(statsRef, { once: true, margin: "-60px" });
+
+  function notify(message) {
+    setToast(message);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(""), 4200);
+  }
+
+  useEffect(
+    () => () => {
+      clearTimeout(toastTimer.current);
+      clearTimeout(copyTimer.current);
+    },
+    [],
+  );
+
+  /* lock smooth scroll + body scroll while covered */
+  const covered = loading || menuOpen || selectedProject !== null;
+  useEffect(() => {
+    if (covered) {
+      stopSmooth();
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      startSmooth();
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [covered]);
+
+  /* role rotator */
+  useEffect(() => {
+    if (!ready || prefersReduced) return;
+    const id = setInterval(
+      () => setRoleIndex((i) => (i + 1) % ROLES.length),
+      2600,
+    );
+    return () => clearInterval(id);
+  }, [ready, prefersReduced]);
+
+  /* active nav section */
+  useEffect(() => {
+    const ids = ["work", "about", "recognition"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        }
+      },
+      { rootMargin: "-40% 0px -55% 0px" },
+    );
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+    return () => observer.disconnect();
+  }, [ready]);
+
+  /* mobile menu escape */
+  useEffect(() => {
+    if (!menuOpen) return;
+    function closeOnEscape(event) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        menuButton.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
+
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopied(true);
+      notify("Email address copied to clipboard.");
+    } catch {
+      notify("Could not copy — please use the email link.");
+    }
+    clearTimeout(copyTimer.current);
+    copyTimer.current = setTimeout(() => setCopied(false), 3500);
+  }
+
+  return (
+    <>
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
+      <AnimatePresence>
+        {loading && <Loader key="loader" onDone={() => setLoading(false)} />}
+      </AnimatePresence>
+      <div className="aurora" aria-hidden="true">
+        <div className="aurora-blob blob-1" />
+        <div className="aurora-blob blob-2" />
+        <div className="aurora-blob blob-3" />
+      </div>
+      <CursorAura />
+      <SideRails />
+
+      <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
+        <div className="header-inner">
+          <a
+            className="wordmark"
+            href="#top"
+            aria-label="Vishal Agrawal, back to top"
+          >
+            va<span>.</span>
+          </a>
+          <nav className="desktop-nav" aria-label="Main navigation">
+            {NAVIGATION.map(([id, label]) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className={activeSection === id ? "is-active" : ""}
+                aria-current={activeSection === id ? "true" : undefined}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+          <div className="header-actions">
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+            <a href="#contact" className="nav-cta">
+              Let&apos;s talk <ArrowUpRight size={15} />
+            </a>
+            <button
+              ref={menuButton}
+              className="mobile-menu-button icon-button"
+              aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav"
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              {menuOpen ? <X size={21} /> : <Menu size={21} />}
+            </button>
+          </div>
+        </div>
+        <motion.div className="scroll-progress" style={{ scaleX: progress }} />
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.nav
+              id="mobile-nav"
+              className="mobile-nav"
+              aria-label="Mobile navigation"
+              initial={{ opacity: 0, y: -14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -14 }}
+              transition={{ duration: 0.3, ease: EASE }}
+            >
+              {[...NAVIGATION, ["contact", "Contact"]].map(([id, label], i) => (
+                <motion.a
+                  key={id}
+                  href={`#${id}`}
+                  onClick={() => setMenuOpen(false)}
+                  initial={{ opacity: 0, x: -24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    delay: 0.06 * i + 0.08,
+                    duration: 0.4,
+                    ease: EASE,
+                  }}
+                >
+                  <span>
+                    <small>0{i + 1} — </small>
+                    {label}
+                  </span>
+                  <ArrowUpRight size={26} />
+                </motion.a>
+              ))}
+            </motion.nav>
+          )}
+        </AnimatePresence>
+      </header>
+
+      <main id="main">
+        <section
+          className="hero section-shell"
+          id="top"
+          onPointerMove={onHeroPointerMove}
+          onPointerLeave={onHeroPointerLeave}
+        >
+          <div className="hero-bg" aria-hidden="true">
+            <HeroField theme={theme} />
+            <div className="hero-grid" />
+            <div className="hero-glow" />
+          </div>
+          <motion.span
+            className="hero-name-ghost"
+            aria-hidden="true"
+            style={
+              prefersReduced ? undefined : { y: ghostY, opacity: ghostOpacity }
+            }
+          >
+            <motion.span
+              className="hero-name-ghost-inner"
+              style={
+                prefersReduced ? undefined : { x: ghostMouseX, y: ghostMouseY }
+              }
+            >
+              AGRAWAL
+            </motion.span>
+          </motion.span>
+          <div className="hero-main">
+            <motion.div
+              className="hero-copy"
+              variants={heroParent}
+              initial="hidden"
+              animate={ready ? "show" : "hidden"}
+            >
+              <motion.div className="eyebrow hero-intro" variants={heroChild}>
+                <span className="short-rule" />
+                VISHAL AGRAWAL <span className="quiet">/ AI ENGINEER</span>
+              </motion.div>
+              <motion.h1 className="hero-title" variants={heroChild}>
+                <span className="line-mask">Intelligence,</span>
+                <span className="line-mask serif">engineered.</span>
+              </motion.h1>
+              <motion.div className="role-rotator" variants={heroChild}>
+                <Terminal size={14} />
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    className="role-word"
+                    key={ROLES[roleIndex]}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.35, ease: EASE }}
+                  >
+                    {ROLES[roleIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </motion.div>
+              <motion.p className="hero-description" variants={heroChild}>
+                I build intelligent systems that bridge
+                <br className="desktop-break" /> research and the real world.
+              </motion.p>
+              <motion.p className="hero-detail" variants={heroChild}>
+                From multilingual voice AI to codebase intelligence.
+                <br />
+                Thoughtfully designed. Engineered for production.
+              </motion.p>
+              <motion.div variants={heroChild}>
+                <span className="hero-current">
+                  <span className="status-dot pulse" />
+                  Currently building {upcoming[0].title} —{" "}
+                  {upcoming[0].subtitle}
+                </span>
+              </motion.div>
+              <motion.div className="hero-actions" variants={heroChild}>
+                <Magnetic>
+                  <a className="button button-primary" href="#work">
+                    Explore my work
+                    <ArrowDown size={16} />
+                  </a>
+                </Magnetic>
+                <Magnetic>
+                  <a
+                    className="button button-ghost"
+                    href={links.resume}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View resume
+                    <ArrowUpRight size={15} />
+                  </a>
+                </Magnetic>
+              </motion.div>
+            </motion.div>
+            <motion.div
+              className="hero-visual"
+              style={prefersReduced ? undefined : { y: orbY }}
+              initial={prefersReduced ? false : { opacity: 0, scale: 0.94 }}
+              animate={ready ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 1.1, ease: EASE }}
+            >
+              <motion.div
+                className="hero-visual-inner"
+                style={
+                  prefersReduced ? undefined : { x: orbMouseX, y: orbMouseY }
+                }
+              >
+                <NeuralSculpture />
+                <span className="orbit-chip chip-1">
+                  <i /> Gemma
+                </span>
+                <span className="orbit-chip chip-2">
+                  <i /> LangGraph
+                </span>
+                <span className="orbit-chip chip-3">
+                  <i /> PyTorch
+                </span>
+                <span className="orbit-chip chip-4">
+                  <i /> FAISS
+                </span>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          <div className="hero-meta">
+            <span className="availability">
+              <span className="status-dot pulse" />
+              Open to roles &amp; research collaborations
+            </span>
+            <span className="hero-location">
+              IIIT NAYA RAIPUR — <LocalTime /> IST
+            </span>
+            <a className="scroll-cue" href="#work">
+              SCROLL TO EXPLORE
+              <ArrowDown size={13} />
+            </a>
+          </div>
+
+          <div className="hero-stats" ref={statsRef}>
+            {STATS.map((stat) => (
+              <Stat key={stat.label} {...stat} started={statsInView && ready} />
+            ))}
+          </div>
+        </section>
+
+        <div className="marquee" aria-hidden="true">
+          <div className="marquee-track">
+            {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
+              <span key={i}>{item}</span>
+            ))}
+          </div>
+        </div>
+
+        <section className="work-section section-shell" id="work">
+          <span className="section-ghost" aria-hidden="true">
+            01
+          </span>
+          <Reveal className="section-heading">
+            <div>
+              <p className="eyebrow">
+                <span className="section-index">01 /</span> SELECTED WORK
+              </p>
+              <h2 className="section-title">
+                Ideas made <span className="serif">tangible.</span>
+              </h2>
+            </div>
+            <p>
+              A selection of systems built to understand,
+              <br />
+              reason, and solve real problems.
+            </p>
+          </Reveal>
+          {projects.slice(0, 2).map((project, i) => (
+            <FeaturedProject
+              key={project.id}
+              project={project}
+              index={i}
+              spotlight={i === 0}
+              onOpen={setSelectedProject}
+            />
+          ))}
+          <Reveal className="work-meta" delay={0.05}>
+            <span>
+              {String(projects.length).padStart(2, "0")} — CASE STUDIES
+            </span>
+            <span>
+              {String(upcoming.length).padStart(2, "0")} — IN DEVELOPMENT
+            </span>
+            <span className="work-meta-cta">
+              SELECT A PROJECT TO OPEN ITS CASE FILE
+            </span>
+          </Reveal>
+          <div className="supporting-projects">
+            {projects.slice(2).map((project) => (
+              <SupportingProject
+                key={project.id}
+                project={project}
+                onOpen={setSelectedProject}
+              />
+            ))}
+          </div>
+          <Reveal className="in-progress">
+            <div>
+              <p className="eyebrow">
+                <span className="status-dot pulse" /> ON THE WORKBENCH
+              </p>
+              <p>Still asking what&apos;s next.</p>
+            </div>
+            <div className="upcoming-list">
+              {upcoming.map((item) => (
+                <details key={item.id}>
+                  <summary>
+                    <span>{item.title}</span>
+                    <span className="mono quiet">{item.status}</span>
+                    <Plus size={18} />
+                  </summary>
+                  <div className="upcoming-body">
+                    <div>
+                      <p>
+                        {item.subtitle} — {item.desc}
+                      </p>
+                      <div className="chip-row">
+                        {item.tech.map((tech) => (
+                          <span className="stack-chip" key={tech}>
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="about-section section-shell" id="about">
+          <span className="section-ghost" aria-hidden="true">
+            02
+          </span>
+          <Reveal className="about-intro">
+            <div>
+              <p className="eyebrow">
+                <span className="section-index">02 /</span> THE ENGINEER BEHIND
+                THE WORK
+              </p>
+              <h2>
+                Curiosity is the input.
+                <br />
+                <span className="muted-heading">Engineering is the craft.</span>
+              </h2>
+            </div>
+            <div className="about-copy">
+              <p>
+                I&apos;m Vishal, an AI and machine learning engineer based at
+                IIIT Naya Raipur, India.
+              </p>
+              <p>
+                My work spans production LLM pipelines, multilingual voice
+                systems, codebase intelligence, and computer vision. I&apos;m
+                interested in the full path from a model&apos;s potential to a
+                system that works in the real world.
+              </p>
+              <a
+                className="text-link"
+                href={links.resume}
+                target="_blank"
+                rel="noreferrer"
+              >
+                A little more about me
+                <ArrowUpRight size={16} />
+              </a>
+            </div>
+          </Reveal>
+          <div className="expertise-grid">
+            {expertise.map((item, i) => {
+              const Icon = EXPERTISE_ICONS[item.category] || Code2;
+              return (
+                <Reveal key={item.category} delay={Math.min(i * 0.06, 0.3)}>
+                  <div className="expertise-item">
+                    <div className="expertise-head">
+                      <span className="mono quiet">0{i + 1}</span>
+                      <Icon size={17} />
+                    </div>
+                    <h3>{item.category}</h3>
+                    <p>{item.skills.join(" / ")}</p>
+                  </div>
+                </Reveal>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="recognition-section section-shell" id="recognition">
+          <span className="section-ghost" aria-hidden="true">
+            03
+          </span>
+          <Reveal className="recognition-layout">
+            <div>
+              <p className="eyebrow">
+                <span className="section-index">03 /</span> ALONG THE WAY
+              </p>
+              <h2>
+                Small milestones.
+                <br />
+                <span className="muted-heading">Forward motion.</span>
+              </h2>
+              <p className="section-description">
+                Building, competing, and getting better
+                <br />
+                with every iteration.
+              </p>
+            </div>
+            <div className="milestones">
+              {milestones.map((item, i) => (
+                <div className="milestone" key={item.org}>
+                  <span className="mono quiet">{item.period}</span>
+                  <span className="milestone-index">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <p className="milestone-role">{item.role}</p>
+                    <h3>{item.org}</h3>
+                    <p className="milestone-detail">{item.desc}</p>
+                  </div>
+                  <ArrowUpRight size={18} />
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="contact-section section-shell" id="contact">
+          <span className="section-ghost" aria-hidden="true">
+            04
+          </span>
+          <Reveal>
+            <div className="contact-top">
+              <p className="eyebrow">
+                <span className="section-index">04 /</span> WHAT&apos;S NEXT?
+              </p>
+              <span className="availability">
+                <span className="status-dot pulse" />
+                Open to meaningful opportunities
+              </span>
+            </div>
+            <div className="contact-heading">
+              <h2>
+                Let&apos;s build something
+                <br />
+                <span className="serif">worth building.</span>
+              </h2>
+              <a
+                className="contact-arrow"
+                href={links.email}
+                aria-label="Email Vishal"
+              >
+                <ArrowUpRight />
+              </a>
+            </div>
+            <div className="contact-grid">
+              <div>
+                <p className="contact-blurb">
+                  AI engineering roles, research collaborations,
+                  <br />
+                  or a good conversation about intelligent systems.
+                </p>
+                <div className="email-line">
+                  <a href={links.email}>{EMAIL}</a>
+                  <button
+                    className="icon-button"
+                    onClick={copyEmail}
+                    aria-label="Copy email address"
+                  >
+                    {copied ? <Check size={17} /> : <Copy size={17} />}
+                  </button>
+                </div>
+                <div className="social-links">
+                  <a href={links.github} target="_blank" rel="noreferrer">
+                    <Github size={15} />
+                    GitHub
+                    <ArrowUpRight size={13} />
+                  </a>
+                  <a href={links.linkedin} target="_blank" rel="noreferrer">
+                    <Linkedin size={15} />
+                    LinkedIn
+                    <ArrowUpRight size={13} />
+                  </a>
+                  <a href={links.twitter} target="_blank" rel="noreferrer">
+                    X / Twitter
+                    <ArrowUpRight size={13} />
+                  </a>
+                </div>
+              </div>
+              <ContactForm notify={notify} />
+            </div>
+          </Reveal>
+        </section>
+      </main>
+
+      <footer className="site-footer">
+        <div className="section-shell footer-top">
+          <a className="wordmark" href="#top" aria-label="Back to top">
+            va<span>.</span>
+          </a>
+          <p>&copy; {new Date().getFullYear()} Vishal Agrawal</p>
+          <span className="mono footer-tag">
+            DESIGNED &amp; BUILT WITH INTENT.
+          </span>
+          <nav className="footer-links" aria-label="Footer navigation">
+            {[...NAVIGATION, ["contact", "Contact"]].map(([id, label]) => (
+              <a key={id} href={`#${id}`}>
+                {label}
+              </a>
+            ))}
+          </nav>
+          <a className="back-top mono" href="#top">
+            BACK TO TOP
+            <ArrowUpRight size={14} />
+          </a>
+        </div>
+        <div className="section-shell">
+          <p className="eyebrow footer-fin">
+            <span className="section-index">05 /</span> FIN
+          </p>
+          <div className="footer-giant" aria-hidden="true">
+            VISHAL AGRAWAL<span>.</span>
+          </div>
+        </div>
+        <div className="section-shell footer-colophon">
+          <span>SET IN SPACE GROTESK &amp; INSTRUMENT SERIF</span>
+          <span>BUILT WITH REACT</span>
+          <span className="clock">
+            NEW RAIPUR, IN — <LocalTime /> IST
+          </span>
+        </div>
+      </footer>
+
+      <CaseStudy
+        project={selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            className="toast"
+            role="status"
+            initial={{ opacity: 0, y: 24, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 12, x: "-50%" }}
+            transition={{ duration: 0.35, ease: EASE }}
+          >
+            <Check size={16} />
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
 }
-
-/* -------- FLAGSHIP PROJECTS SHOWCASE -------- */
-.projects-list {
-  display: flex;
-  flex-direction: column;
-  gap: 96px;
-}
-
-.project-product-page {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 44px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-  transition: border-color 0.3s;
-}
-
-.project-product-page:hover {
-  border-color: var(--border-strong);
-}
-
-.project-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
-}
-
-.project-number-badge {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent);
-  background: var(--accent-soft);
-  padding: 6px 14px;
-  border-radius: 8px;
-}
-
-.project-title-group {
-  flex: 1;
-}
-
-.project-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.project-tagline {
-  font-size: 15px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.project-github-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-muted);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  transition: all 0.2s;
-}
-
-.project-github-link:hover {
-  color: var(--text);
-  border-color: var(--accent);
-}
-
-.project-banner-container {
-  position: relative;
-  width: 100%;
-  height: 380px;
-  border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: 40px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-}
-
-.project-banner-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.project-banner-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.6));
-  pointer-events: none;
-}
-
-.project-banner-badge {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(8px);
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* WAVEFORM ANIMATION FOR SANJEEVANI */
-.waveform-bar-wrap {
-  position: absolute;
-  bottom: 16px;
-  right: 16px;
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(8px);
-  padding: 8px 16px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid var(--border);
-}
-.waveform-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--accent);
-  letter-spacing: 0.05em;
-}
-.waveform-bars {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  height: 16px;
-}
-.waveform-bars span {
-  width: 3px;
-  background: var(--accent);
-  border-radius: 2px;
-  animation: wavePulse 1.2s ease-in-out infinite alternate;
-}
-@keyframes wavePulse {
-  0% { transform: scaleY(0.2); opacity: 0.4; }
-  100% { transform: scaleY(1.2); opacity: 1; }
-}
-
-.project-story-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 32px;
-  margin-bottom: 40px;
-}
-
-.story-block {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.story-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--accent);
-  text-transform: uppercase;
-}
-
-.story-text {
-  font-size: 14.5px;
-  color: var(--text-muted);
-  line-height: 1.65;
-}
-
-/* INTERACTIVE ARCHITECTURE PIPELINE */
-.interactive-arch-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.arch-steps-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.arch-step-interactive {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.arch-step-interactive:hover {
-  border-color: var(--border-strong);
-}
-
-.arch-step--active {
-  border-color: var(--accent) !important;
-  background: var(--accent-soft);
-}
-
-.arch-step-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.arch-num {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.arch-stage {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.arch-tech {
-  font-size: 11.5px;
-  color: var(--text-dim);
-}
-
-.arch-detail-box {
-  background: var(--bg-elevated);
-  border: 1px solid var(--accent);
-  padding: 16px;
-  border-radius: 12px;
-}
-
-.arch-detail-tag {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  display: block;
-  margin-bottom: 4px;
-}
-
-.arch-detail-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.arch-detail-desc {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-.results-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.results-list li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.text-accent {
-  color: var(--accent);
-}
-
-.project-tech-footer {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
-}
-
-.tech-footer-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--text-dim);
-}
-
-.tech-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tech-pill {
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-}
-
-.project-action-links {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.project-action-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-muted);
-  text-decoration: none;
-  font-size: 13.5px;
-  font-weight: 500;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  transition: all 0.2s;
-}
-
-.project-action-link:hover {
-  color: var(--text);
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-/* -------- UPCOMING PROJECTS SECTION -------- */
-.upcoming-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 32px;
-}
-
-.upcoming-tilt-wrap {
-  width: 100%;
-  transform-style: preserve-3d;
-}
-
-.upcoming-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 36px;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.upcoming-card:hover {
-  border-color: var(--border-strong);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-}
-
-.upcoming-card-header {
-  margin-bottom: 20px;
-}
-
-.upcoming-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 4px 12px;
-  border-radius: 20px;
-  border: 1px solid;
-  background: var(--accent-soft);
-}
-
-.upcoming-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  letter-spacing: -0.02em;
-}
-
-.upcoming-subtitle {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent);
-  margin-bottom: 16px;
-}
-
-.upcoming-desc {
-  font-size: 14.5px;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 28px;
-  flex: 1;
-}
-
-.upcoming-tech-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.upcoming-tech-pill {
-  font-size: 11.5px;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 6px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-}
-
-/* -------- JOURNEY SECTION -------- */
-.journey-list {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.journey-item {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 32px;
-  padding: 32px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  transition: border-color 0.3s;
-}
-
-.journey-item:hover {
-  border-color: var(--accent);
-}
-
-.journey-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.journey-org {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.journey-period {
-  font-size: 13px;
-  color: var(--accent);
-  font-weight: 500;
-}
-
-.journey-role {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.journey-desc {
-  font-size: 14.5px;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-/* -------- CONTACT SECTION -------- */
-.contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 64px;
-  align-items: start;
-}
-
-.contact-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(32px, 4vw, 44px);
-  font-weight: 700;
-  line-height: 1.15;
-  margin-bottom: 16px;
-}
-
-.contact-desc {
-  font-size: 16px;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 36px;
-}
-
-.contact-details {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 36px;
-}
-
-.contact-detail-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--text-muted);
-  font-size: 15px;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.contact-detail-btn {
-  background: none;
-  border: none;
-  font-family: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-
-.contact-detail-item:hover {
-  color: var(--accent);
-}
-
-.copy-icon {
-  opacity: 0.6;
-}
-
-.social-links {
-  display: flex;
-  gap: 12px;
-}
-
-.social-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.social-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-
-.contact-form-container {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 36px;
-}
-
-.contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-.form-group input, .form-group textarea {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 14px;
-  color: var(--text);
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.2s;
-}
-
-.form-group input:focus, .form-group textarea:focus {
-  border-color: var(--accent);
-}
-
-.contact-success-msg {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13.5px;
-  color: var(--accent);
-  margin-top: 8px;
-}
-
-/* -------- FOOTER -------- */
-.footer {
-  border-top: 1px solid var(--border);
-  padding: 48px 24px;
-  background: var(--bg-elevated);
-}
-
-.footer-container {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 24px;
-}
-
-.footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-}
-
-.footer-copy {
-  font-size: 13.5px;
-  color: var(--text-dim);
-}
-
-.footer-links {
-  display: flex;
-  gap: 20px;
-}
-
-.footer-links a {
-  color: var(--text-dim);
-  text-decoration: none;
-  font-size: 13.5px;
-  transition: color 0.2s;
-}
-
-.footer-links a:hover {
-  color: var(--accent);
-}
-
-/* -------- RESPONSIVE MEDIA QUERIES -------- */
-@media (max-width: 860px) {
-  .nav-links { display: none; }
-  .project-product-page { padding: 24px; }
-  .project-banner-container { height: 240px; }
-  .journey-item { grid-template-columns: 1fr; gap: 12px; }
-  .contact-grid { grid-template-columns: 1fr; }
-}
-`;

@@ -2,24 +2,54 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='10' fill='%2309090b' stroke='%2327272a' stroke-width='1'/><path d='M11 13L18.5 28H21.5L29 13' stroke='%23f59e0b' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/><path d='M22.5 13L30 28' stroke='%2371717a' stroke-width='2.2' stroke-linecap='round' opacity='0.6'/></svg>" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='5' fill='%23070907'/><path d='M9 12L17 29L25 12M21 21L28 29' stroke='%23b9d9b0' fill='none' stroke-width='2.5'/></svg>"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vishal Agrawal | AI & Machine Learning Engineer</title>
-    <meta name="description" content="Portfolio of Vishal Agrawal — AI Engineer, Machine Learning Engineer & Generative AI Developer building intelligent systems, RAG pipelines, and edge AI applications." />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta
+      name="description"
+      content="Portfolio of Vishal Agrawal — AI Engineer, Machine Learning Engineer & Generative AI Developer building intelligent systems, RAG pipelines, and edge AI applications."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta name="theme-color" content="#070907" />
+    <script>
+      try {
+        var t = localStorage.getItem("va-theme");
+        if (!t) {
+          t = window.matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        }
+        document.documentElement.dataset.theme = t;
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.content = t === "light" ? "#f2eee3" : "#070907";
+      } catch (e) {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
     <style>
-      *, *::before, *::after {
+      *,
+      *::before,
+      *::after {
         box-sizing: border-box;
       }
-      html, body, #root {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        min-height: 100vh !important;
-        background-color: #09090b !important;
-        overflow-x: hidden;
+      html,
+      body,
+      #root {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-height: 100vh;
+        background-color: #070907;
+      }
+      html[data-theme="light"],
+      html[data-theme="light"] body,
+      html[data-theme="light"] #root {
+        background-color: #f2eee3;
       }
     </style>
   </head>
