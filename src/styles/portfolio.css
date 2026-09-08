@@ -2088,6 +2088,21 @@ body::after {
   letter-spacing: 0.14em;
   color: var(--faint);
 }
+.upcoming-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  padding: 20px 4px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+}
+.upcoming-cta .text-link {
+  margin-top: 0;
+}
 
 /* ---------- about ---------- */
 .about-section {

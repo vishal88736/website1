@@ -50,21 +50,21 @@ const ROLES = [
 ];
 const NAVIGATION = [
   ["work", "Work"],
-  ["upcoming", "Next"],
+  ["upcoming", "Upcoming"],
   ["about", "About"],
   ["recognition", "Recognition"],
 ];
 const MARQUEE_ITEMS = [
+  "ML Systems",
+  "Deep Learning",
   "RAG Pipelines",
-  "LangGraph Agents",
+  "Agentic AI",
+  "LLM Apps",
+  "LLMOps",
   "Multilingual Voice AI",
   "Vector Search",
-  "PyTorch",
   "AST Knowledge Graphs",
-  "Neo4j",
   "FastAPI",
-  "Computer Vision",
-  "Edge AI",
 ];
 const GLOBE_STACK = ["ML", "DL", "RAG", "Agentic AI", "LLM", "LLMOps"];
 const EXPERTISE_ICONS = {
@@ -1191,7 +1191,9 @@ function CaseStudy({ project, onClose }) {
           >
             {project.id === "sanjeevani"
               ? "Explore the source"
-              : "Visit GitHub profile"}
+              : project.github !== links.github
+                ? "View repository"
+                : "Visit GitHub profile"}
             <ArrowUpRight size={17} />
           </a>
         </div>
@@ -1662,11 +1664,16 @@ export default function Portfolio() {
                 }
               >
                 <NeuralSculpture />
-                <div className="orbit-system" aria-hidden="false">
+                <div
+                  className="orbit-system"
+                  role="img"
+                  aria-label="Core stack: ML, DL, RAG, Agentic AI, LLM, LLMOps"
+                >
                   {GLOBE_STACK.map((label, i) => (
                     <span
                       key={label}
                       className="orbit-chip"
+                      aria-hidden="true"
                       style={{
                         "--a0": `${i * 60}deg`,
                         "--bob-delay": `${i * -0.9}s`,
@@ -1795,6 +1802,15 @@ export default function Portfolio() {
               </Reveal>
             ))}
           </div>
+          <Reveal className="upcoming-cta" delay={0.1}>
+            <span>
+              Working on something adjacent — agentic systems, voice AI, or
+              applied LLM work?
+            </span>
+            <a className="text-link" href="#contact">
+              Let&apos;s talk <ArrowUpRight size={16} />
+            </a>
+          </Reveal>
         </section>
 
         <section className="about-section section-shell" id="about">
