@@ -334,7 +334,7 @@ function ThemeToggle({ theme, onToggle }) {
   return (
     <button
       className="theme-toggle"
-      onClick={onToggle}
+      onClick={(event) => onToggle(event)}
       aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
       aria-pressed={!dark}
       title={dark ? "Light mode" : "Dark mode"}
@@ -1335,11 +1335,23 @@ const heroChild = {
 export default function Portfolio() {
   const prefersReduced = useReducedMotion();
   const [theme, baseToggleTheme] = useTheme();
-  function toggleTheme() {
+  function toggleTheme(event) {
     if (prefersReduced) {
       baseToggleTheme();
       return;
     }
+    // Origin for the circular reveal — toggle position, else top-right fallback.
+    const x =
+      event?.clientX ?? Math.round(window.innerWidth - 60) ?? window.innerWidth;
+    const y = event?.clientY ?? 60;
+    document.documentElement.style.setProperty("--theme-x", `${x}px`);
+    document.documentElement.style.setProperty("--theme-y", `${y}px`);
+    // Premium path: View Transitions circular reveal from the toggle.
+    if (typeof document.startViewTransition === "function") {
+      document.startViewTransition(() => baseToggleTheme());
+      return;
+    }
+    // Fallback: soft cross-fade of themed properties.
     document.documentElement.classList.add("theming");
     baseToggleTheme();
     setTimeout(() => document.documentElement.classList.remove("theming"), 650);

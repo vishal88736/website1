@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 
 /**
- * Butter-smooth scrolling with correct cleanup.
+ * JS smooth scroller (Lenis) — the single owner of smoothing.
  * - Uses Lenis' built-in autoRaf loop (no manual rAF chain to leak).
  * - Intercepts in-page anchor clicks and scrolls with a header offset.
- * - Disabled when the user prefers reduced motion.
+ * - Moves keyboard focus to the target (skip-link / a11y).
+ * - Handles an initial location.hash on load.
+ * - Disabled when the user prefers reduced motion (native jump instead).
  * - Exposes the instance on window.__lenis so modal/menu code can stop/start it.
  */
 export default function SmoothScroll({ children }) {
@@ -21,18 +23,43 @@ export default function SmoothScroll({ children }) {
     });
     window.__lenis = lenis;
 
+    function focusTarget(target) {
+      if (!target) return;
+      if (!target.hasAttribute("tabindex")) {
+        target.setAttribute("tabindex", "-1");
+      }
+      target.focus({ preventScroll: true });
+    }
+
+    function scrollToTarget(target, { immediate = false } = {}) {
+      if (immediate) {
+        lenis.scrollTo(target, { offset: -84, immediate: true });
+      } else {
+        lenis.scrollTo(target, { offset: -84, duration: 1.4 });
+      }
+    }
+
     function onClick(event) {
       const anchor = event.target.closest('a[href^="#"]');
       if (!anchor) return;
       const id = anchor.getAttribute("href");
-      if (id.length < 2) return;
+      if (!id || id.length < 2) return;
       const target = document.querySelector(id);
       if (!target) return;
       event.preventDefault();
-      lenis.scrollTo(target, { offset: -84, duration: 1.4 });
+      scrollToTarget(target);
       history.replaceState(null, "", id);
+      focusTarget(target);
     }
     document.addEventListener("click", onClick);
+
+    // Deep link on load (e.g. /#work): jump past the loader without animation.
+    if (window.location.hash.length > 1) {
+      const initial = document.querySelector(window.location.hash);
+      if (initial) {
+        requestAnimationFrame(() => scrollToTarget(initial, { immediate: true }));
+      }
+    }
 
     return () => {
       document.removeEventListener("click", onClick);

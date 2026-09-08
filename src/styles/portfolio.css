@@ -47,7 +47,33 @@
   --body: "Inter", system-ui, sans-serif;
   --radius: 14px;
   --header-h: 76px;
+  --theme-x: 92vw;
+  --theme-y: 40px;
   color-scheme: dark;
+}
+
+/* ---------- theme switch reveal (View Transitions) ---------- */
+/* Circular wipe expands from the toggle. Old snapshot holds still
+   underneath while the new theme reveals on top. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+  animation: theme-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0px at var(--theme-x) var(--theme-y));
+  }
+  to {
+    clip-path: circle(max(150vw, 150vh) at var(--theme-x) var(--theme-y));
+  }
 }
 
 [data-theme="light"] {
@@ -88,7 +114,9 @@
   box-sizing: border-box;
 }
 html {
-  scroll-behavior: smooth;
+  /* JS smooth scroller (Lenis) owns smoothing — never CSS smooth here,
+     or anchors double-smooth / bypass the header offset. */
+  scroll-behavior: auto;
   scroll-padding-top: 96px;
 }
 html.lenis,
@@ -97,6 +125,12 @@ html.lenis body {
 }
 .lenis.lenis-smooth {
   scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 body {
   margin: 0;
@@ -652,6 +686,9 @@ body::after {
   border-color: var(--accent);
   transform: rotate(12deg);
   background: var(--accent-soft);
+}
+.theme-toggle:active {
+  transform: rotate(12deg) scale(0.9);
 }
 .nav-cta {
   display: inline-flex;
@@ -3383,6 +3420,10 @@ html.theming *::after {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
   }
   *,
   *::before,
