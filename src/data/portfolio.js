@@ -256,6 +256,132 @@ export const projects = [
     },
     github: "https://github.com/vishal88736",
   },
+  {
+    id: "alpaca",
+    number: "05",
+    title: "Alpaca Trading Agentic AI",
+    tagline: "Signal/Terminal — Autonomous AI Trading on Alpaca Paper Trading",
+    category: "Agentic Trading",
+    summary:
+      "An autonomous paper-trading platform where strategy agents propose structured trade intents, a deterministic risk engine approves or rejects them, and a React terminal surfaces positions, decisions, and automation state.",
+    story: {
+      problem:
+        "Autonomous trading ideas need a safe path from model output to broker execution without bypassing risk controls or leaking credentials.",
+      solution:
+        "A layered platform where strategy agents and an LLM orchestrator only produce structured TradeSignal and TradeIntent objects, while a deterministic FastAPI risk engine is the sole gate before any Alpaca paper order.",
+      architecture: [
+        {
+          stage: "Strategy Agents",
+          tech: "BaseStrategy / Pydantic",
+          detail:
+            "Five typed strategy stubs implement initialize, analyze, and generate_signal to emit structured TradeSignal objects.",
+        },
+        {
+          stage: "News Context",
+          tech: "News Service",
+          detail:
+            "Fuses market headlines into a NewsSignal so strategy output is read alongside current conditions.",
+        },
+        {
+          stage: "LLM Orchestrator",
+          tech: "Signal Fusion",
+          detail:
+            "Combines strategy signal, news signal, and portfolio context into a single TradeIntent for review.",
+        },
+        {
+          stage: "Risk Engine",
+          tech: "Deterministic Checks",
+          detail:
+            "Evaluates kill switch, asset allowlist, exposure limits, buying power, and daily guards before any order.",
+        },
+        {
+          stage: "Terminal & Log",
+          tech: "React / WebSocket",
+          detail:
+            "Dashboard shows positions and P&L while every approval, rejection, and automation transition is logged.",
+        },
+      ],
+      challenge:
+        "Safe Autonomy: Keeping LLM reasoning strictly upstream of execution so no trade reaches Alpaca without passing deterministic risk checks and session-scoped paper credentials.",
+      results: [
+        "Deterministic Risk Gate on Every Order",
+        "Paper-Trading Only with Audited Decisions",
+        "Live Dashboard with Automation Controls",
+      ],
+      techStack: [
+        "Python",
+        "FastAPI",
+        "React",
+        "Alpaca API",
+        "Pydantic",
+        "WebSocket",
+      ],
+    },
+    github: "https://github.com/vishal88736/alpaca-ai-trading-agent",
+  },
+  {
+    id: "finance",
+    number: "06",
+    title: "Razorpay Finance Controller",
+    tagline: "AI Finance Controller — Deterministic Truth, Agentic Investigation",
+    category: "AI Finance",
+    summary:
+      "A financial operations workspace where pure Python handles parsing, Decimal normalization, matching, and scoring, while LangGraph agents handle routing, reasoning, and investigation with threads and an audit trail.",
+    story: {
+      problem:
+        "Financial reconciliation needs exact arithmetic and traceable evidence, not fluent estimates — while still supporting natural-language investigation.",
+      solution:
+        "A thread-scoped workspace with a deterministic Pandas reconciliation engine for netting, tolerance, and duplicate checks, fronted by a LangGraph router for intent routing, summarization, and guardrailed Q&A.",
+      architecture: [
+        {
+          stage: "Thread Workspace",
+          tech: "Thread Isolation",
+          detail:
+            "Every conversation runs in an isolated thread_id with its own document registry and results store.",
+        },
+        {
+          stage: "Duplicate Checks",
+          tech: "SHA-256 + Fingerprint",
+          detail:
+            "Level 1 detects exact file duplicates by bytes; Level 2 detects logical duplicates by canonical records.",
+        },
+        {
+          stage: "Reconciliation",
+          tech: "Pandas Engine",
+          detail:
+            "Deterministic engine nets fees, refunds, and chargebacks with Decimal precision and explicit FX handling.",
+        },
+        {
+          stage: "Agentic Router",
+          tech: "LangGraph",
+          detail:
+            "Routes reconciliation, exception, and Q&A intents with layered guardrails for scope and permissions.",
+        },
+        {
+          stage: "Audit Trail",
+          tech: "SQLite / Trace",
+          detail:
+            "Records every action, tool call, and outcome in an append-only log for review and replay.",
+        },
+      ],
+      challenge:
+        "Truth Separation: Keeping all figures, matches, and metrics in deterministic Python so the LLM never becomes the source of financial truth.",
+      results: [
+        "Deterministic Python for All Calculations",
+        "Guardrailed Routing and Investigation",
+        "Immutable Audit Trail per Thread",
+      ],
+      techStack: [
+        "Python",
+        "FastAPI",
+        "LangGraph",
+        "Pandas",
+        "SQLite",
+        "Next.js",
+      ],
+    },
+    github: "https://github.com/vishal88736/finance-controller",
+  },
 ];
 
 export const expertise = [

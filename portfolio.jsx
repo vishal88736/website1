@@ -50,6 +50,7 @@ const ROLES = [
 ];
 const NAVIGATION = [
   ["work", "Work"],
+  ["upcoming", "Next"],
   ["about", "About"],
   ["recognition", "Recognition"],
 ];
@@ -65,18 +66,7 @@ const MARQUEE_ITEMS = [
   "Computer Vision",
   "Edge AI",
 ];
-const STATS = [
-  { value: 6, suffix: "+", label: "Indic dialects speaking to Sanjeevani" },
-  {
-    value: 1.2,
-    decimals: 1,
-    prefix: "<",
-    suffix: "s",
-    label: "End-to-end voice-to-triage latency",
-  },
-  { value: 200, suffix: "+", label: "DSA problems solved across platforms" },
-  { value: 10, suffix: "×", label: "Faster onboarding with Codrix.AI" },
-];
+const GLOBE_STACK = ["ML", "DL", "RAG", "Agentic AI", "LLM", "LLMOps"];
 const EXPERTISE_ICONS = {
   "Artificial Intelligence": Brain,
   "Machine Learning": Cpu,
@@ -798,32 +788,150 @@ function ProjectVisual({ kind }) {
         <div className="visual-sheen" aria-hidden="true" />
       </div>
     );
+  if (kind === "cottonfield")
+    return (
+      <div
+        className="project-visual field-visual"
+        aria-label="Conceptual orthomosaic patch tiling visualization, not actual field data"
+      >
+        <div className="visual-topline mono">
+          <span>ORTHOMOSAIC / PATCH ANALYSIS</span>
+          <span>04</span>
+        </div>
+        <div className="field-grid" aria-hidden="true">
+          {Array.from({ length: 84 }, (_, i) => (
+            <i
+              key={i}
+              style={{ "--tile-opacity": 0.12 + ((i * 17 + 3) % 13) / 24 }}
+            />
+          ))}
+          <div className="field-focus">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+        <div className="visual-bottom mono">
+          <span>RESTORE / CLASSIFY / MAP</span>
+          <span>CONCEPT STUDY</span>
+        </div>
+        <div className="visual-sheen" aria-hidden="true" />
+      </div>
+    );
+  if (kind === "alpaca")
+    return (
+      <div
+        className="project-visual trading-visual"
+        aria-label="Conceptual visualization of the agentic paper-trading workflow"
+      >
+        <div className="visual-topline mono">
+          <span>SIGNAL/TERMINAL / PAPER TRADING</span>
+          <span>AGENTIC WORKFLOW</span>
+        </div>
+        <div className="trading-composition">
+          <div className="trading-chart" aria-hidden="true">
+            <svg viewBox="0 0 260 120" fill="none">
+              <path
+                className="chart-line"
+                d="M8 92 L38 78 L62 84 L92 58 L118 66 L148 38 L176 48 L205 22 L236 30 L252 14"
+              />
+              <path
+                className="chart-area"
+                d="M8 92 L38 78 L62 84 L92 58 L118 66 L148 38 L176 48 L205 22 L236 30 L252 14 L252 120 L8 120 Z"
+              />
+              {[92, 148, 205].map((x, i) => (
+                <g key={x}>
+                  <circle cx={x} cy={[58, 38, 22][i]} r="4" className="dot" />
+                  <circle
+                    cx={x}
+                    cy={[58, 38, 22][i]}
+                    r="9"
+                    className="pulse-ring"
+                  />
+                </g>
+              ))}
+            </svg>
+            <div className="trading-ticker mono">
+              <span className="up">PAPER</span>
+              <span>ALPACA API</span>
+              <span className="risk">RISK-GATED</span>
+            </div>
+          </div>
+          <div className="trading-flow mono">
+            <span>Strategy</span>
+            <ArrowRight size={12} />
+            <span>LLM intent</span>
+            <ArrowRight size={12} />
+            <span className="accent">Risk engine</span>
+            <ArrowRight size={12} />
+            <span>Broker</span>
+          </div>
+          <div className="trading-agents">
+            <span className="mono">5 STRATEGY AGENTS</span>
+            <span className="mono">DECISION LOG</span>
+          </div>
+        </div>
+        <div className="visual-bottom mono">
+          <span>SIGNAL → INTENT → APPROVE / REJECT</span>
+          <span>DASHBOARD STUDY</span>
+        </div>
+        <div className="visual-sheen" aria-hidden="true" />
+      </div>
+    );
+  if (kind === "finance")
+    return (
+      <div
+        className="project-visual finance-visual"
+        aria-label="Conceptual visualization of deterministic reconciliation with agentic investigation"
+      >
+        <div className="visual-topline mono">
+          <span>FINANCE CONTROLLER / RECONCILIATION</span>
+          <span>PYTHON TRUTH × AI REASONING</span>
+        </div>
+        <div className="finance-composition">
+          <div className="finance-sources mono">
+            <span>Ledger</span>
+            <span>Bank</span>
+            <span>Processor</span>
+          </div>
+          <div className="finance-engine">
+            <span className="mono">DETERMINISTIC PYTHON ENGINE</span>
+            <div className="finance-bar" aria-hidden="true">
+              <i style={{ "--w": "82%" }} />
+            </div>
+            <span className="mono quiet">Decimal · tolerance · duplicates</span>
+          </div>
+          <div className="finance-outcome mono">
+            <span>
+              <Check size={12} /> matched with evidence
+            </span>
+            <span>
+              <Check size={12} /> exceptions queued
+            </span>
+            <span>
+              <Check size={12} /> audit trail sealed
+            </span>
+          </div>
+        </div>
+        <div className="visual-bottom mono">
+          <span>PYTHON COMPUTES · AI ROUTES &amp; EXPLAINS</span>
+          <span>THREAD-SCOPED</span>
+        </div>
+        <div className="visual-sheen" aria-hidden="true" />
+      </div>
+    );
   return (
     <div
       className="project-visual field-visual"
-      aria-label="Conceptual orthomosaic patch tiling visualization, not actual field data"
+      aria-label="Conceptual project visualization"
     >
       <div className="visual-topline mono">
-        <span>ORTHOMOSAIC / PATCH ANALYSIS</span>
-        <span>04</span>
+        <span>PROJECT STUDY</span>
+        <span>—</span>
       </div>
-      <div className="field-grid" aria-hidden="true">
-        {Array.from({ length: 84 }, (_, i) => (
-          <i
-            key={i}
-            style={{ "--tile-opacity": 0.12 + ((i * 17 + 3) % 13) / 24 }}
-          />
-        ))}
-        <div className="field-focus">
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
-      </div>
-      <div className="visual-bottom mono">
-        <span>RESTORE / CLASSIFY / MAP</span>
-        <span>CONCEPT STUDY</span>
+      <div className="voice-center">
+        <span className="mono">EXPLORE THE CASE FILE</span>
       </div>
       <div className="visual-sheen" aria-hidden="true" />
     </div>
@@ -855,7 +963,7 @@ function Stat({
 
 /* ========================= project cards ========================= */
 
-function FeaturedProject({ project, index, onOpen, spotlight = false }) {
+function FeaturedProject({ project, index, onOpen }) {
   const heading = (
     <>
       <p className="eyebrow">
@@ -909,7 +1017,7 @@ function FeaturedProject({ project, index, onOpen, spotlight = false }) {
   return (
     <Reveal>
       <TiltCard
-        className={`featured-project ${index === 1 ? "project-reverse" : ""}${spotlight ? " spotlight" : ""}`}
+        className={`featured-project ${index % 2 === 1 ? "project-reverse" : ""}`}
       >
         <div className="visual-col">
           <button
@@ -923,29 +1031,13 @@ function FeaturedProject({ project, index, onOpen, spotlight = false }) {
             </span>
           </button>
         </div>
-        {spotlight ? (
-          <div className="project-copy spotlight-copy">
-            <div className="spotlight-main">
-              {heading}
-              {award}
-            </div>
-            <div className="spotlight-side">
-              <p className="mono side-label">Stack</p>
-              {chips}
-              <p className="mono side-label">Outcomes</p>
-              {outcomes}
-              {openLink}
-            </div>
-          </div>
-        ) : (
-          <div className="project-copy">
-            {heading}
-            {chips}
-            {outcomes}
-            {award}
-            {openLink}
-          </div>
-        )}
+        <div className="project-copy">
+          {heading}
+          {chips}
+          {outcomes}
+          {award}
+          {openLink}
+        </div>
       </TiltCard>
     </Reveal>
   );
@@ -1265,7 +1357,6 @@ export default function Portfolio() {
   const menuButton = useRef(null);
   const toastTimer = useRef(null);
   const copyTimer = useRef(null);
-  const statsRef = useRef(null);
   const scrolled = useScrolled(16);
   const ready = !loading;
 
@@ -1295,7 +1386,6 @@ export default function Portfolio() {
     heroMx.set(0);
     heroMy.set(0);
   }
-  const statsInView = useInView(statsRef, { once: true, margin: "-60px" });
 
   function notify(message) {
     setToast(message);
@@ -1338,7 +1428,7 @@ export default function Portfolio() {
 
   /* active nav section */
   useEffect(() => {
-    const ids = ["work", "about", "recognition"];
+    const ids = ["work", "upcoming", "about", "recognition"];
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -1532,16 +1622,10 @@ export default function Portfolio() {
                 I build intelligent systems that bridge
                 <br className="desktop-break" /> research and the real world.
               </motion.p>
-              <motion.p className="hero-detail" variants={heroChild}>
-                From multilingual voice AI to codebase intelligence.
-                <br />
-                Thoughtfully designed. Engineered for production.
-              </motion.p>
               <motion.div variants={heroChild}>
                 <span className="hero-current">
                   <span className="status-dot pulse" />
-                  Currently building {upcoming[0].title} —{" "}
-                  {upcoming[0].subtitle}
+                  Looking for an opportunity to explore
                 </span>
               </motion.div>
               <motion.div className="hero-actions" variants={heroChild}>
@@ -1578,18 +1662,21 @@ export default function Portfolio() {
                 }
               >
                 <NeuralSculpture />
-                <span className="orbit-chip chip-1">
-                  <i /> Gemma
-                </span>
-                <span className="orbit-chip chip-2">
-                  <i /> LangGraph
-                </span>
-                <span className="orbit-chip chip-3">
-                  <i /> PyTorch
-                </span>
-                <span className="orbit-chip chip-4">
-                  <i /> FAISS
-                </span>
+                <div className="orbit-system" aria-hidden="false">
+                  {GLOBE_STACK.map((label, i) => (
+                    <span
+                      key={label}
+                      className="orbit-chip"
+                      style={{
+                        "--a0": `${i * 60}deg`,
+                        "--bob-delay": `${i * -0.9}s`,
+                        "--depth-delay": `${i * -6}s`,
+                      }}
+                    >
+                      <i /> {label}
+                    </span>
+                  ))}
+                </div>
               </motion.div>
             </motion.div>
           </div>
@@ -1606,12 +1693,6 @@ export default function Portfolio() {
               SCROLL TO EXPLORE
               <ArrowDown size={13} />
             </a>
-          </div>
-
-          <div className="hero-stats" ref={statsRef}>
-            {STATS.map((stat) => (
-              <Stat key={stat.label} {...stat} started={statsInView && ready} />
-            ))}
           </div>
         </section>
 
@@ -1642,12 +1723,11 @@ export default function Portfolio() {
               reason, and solve real problems.
             </p>
           </Reveal>
-          {projects.slice(0, 2).map((project, i) => (
+          {projects.map((project, i) => (
             <FeaturedProject
               key={project.id}
               project={project}
               index={i}
-              spotlight={i === 0}
               onOpen={setSelectedProject}
             />
           ))}
@@ -1662,58 +1742,69 @@ export default function Portfolio() {
               SELECT A PROJECT TO OPEN ITS CASE FILE
             </span>
           </Reveal>
-          <div className="supporting-projects">
-            {projects.slice(2).map((project) => (
-              <SupportingProject
-                key={project.id}
-                project={project}
-                onOpen={setSelectedProject}
-              />
-            ))}
-          </div>
-          <Reveal className="in-progress">
+        </section>
+
+        <section className="upcoming-section section-shell" id="upcoming">
+          <span className="section-ghost" aria-hidden="true">
+            02
+          </span>
+          <Reveal className="section-heading">
             <div>
               <p className="eyebrow">
-                <span className="status-dot pulse" /> ON THE WORKBENCH
+                <span className="section-index">02 /</span> ON THE WORKBENCH
               </p>
-              <p>Still asking what&apos;s next.</p>
+              <h2 className="section-title">
+                What&apos;s <span className="serif">next.</span>
+              </h2>
             </div>
-            <div className="upcoming-list">
-              {upcoming.map((item) => (
-                <details key={item.id}>
-                  <summary>
-                    <span>{item.title}</span>
-                    <span className="mono quiet">{item.status}</span>
-                    <Plus size={18} />
-                  </summary>
-                  <div className="upcoming-body">
-                    <div>
-                      <p>
-                        {item.subtitle} — {item.desc}
-                      </p>
-                      <div className="chip-row">
-                        {item.tech.map((tech) => (
-                          <span className="stack-chip" key={tech}>
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </details>
-              ))}
-            </div>
+            <p>
+              Currently exploring and building —
+              <br />
+              distinct from shipped work above.
+            </p>
           </Reveal>
+          <div className="upcoming-grid">
+            {upcoming.map((item, i) => (
+              <Reveal key={item.id} delay={Math.min(i * 0.08, 0.24)}>
+                <article className="upcoming-card">
+                  <div className="upcoming-top">
+                    <span className="upcoming-status">
+                      <span className="status-dot pulse" />
+                      {item.status}
+                    </span>
+                    <span className="mono quiet">
+                      {String(i + 1).padStart(2, "0")} /{" "}
+                      {String(upcoming.length).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p className="upcoming-subtitle">{item.subtitle}</p>
+                  <p className="upcoming-desc">{item.desc}</p>
+                  <div className="chip-row">
+                    {item.tech.map((tech) => (
+                      <span className="stack-chip" key={tech}>
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="upcoming-foot mono">
+                    <span>IN PROGRESS</span>
+                    <span>NOT YET SHIPPED</span>
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
         </section>
 
         <section className="about-section section-shell" id="about">
           <span className="section-ghost" aria-hidden="true">
-            02
+            03
           </span>
           <Reveal className="about-intro">
             <div>
               <p className="eyebrow">
-                <span className="section-index">02 /</span> THE ENGINEER BEHIND
+                <span className="section-index">03 /</span> THE ENGINEER BEHIND
                 THE WORK
               </p>
               <h2>
@@ -1765,12 +1856,12 @@ export default function Portfolio() {
 
         <section className="recognition-section section-shell" id="recognition">
           <span className="section-ghost" aria-hidden="true">
-            03
+            04
           </span>
           <Reveal className="recognition-layout">
             <div>
               <p className="eyebrow">
-                <span className="section-index">03 /</span> ALONG THE WAY
+                <span className="section-index">04 /</span> ALONG THE WAY
               </p>
               <h2>
                 Small milestones.
@@ -1804,12 +1895,12 @@ export default function Portfolio() {
 
         <section className="contact-section section-shell" id="contact">
           <span className="section-ghost" aria-hidden="true">
-            04
+            05
           </span>
           <Reveal>
             <div className="contact-top">
               <p className="eyebrow">
-                <span className="section-index">04 /</span> WHAT&apos;S NEXT?
+                <span className="section-index">05 /</span> WHAT&apos;S NEXT?
               </p>
               <span className="availability">
                 <span className="status-dot pulse" />
@@ -1893,7 +1984,7 @@ export default function Portfolio() {
         </div>
         <div className="section-shell">
           <p className="eyebrow footer-fin">
-            <span className="section-index">05 /</span> FIN
+            <span className="section-index">06 /</span> FIN
           </p>
           <div className="footer-giant" aria-hidden="true">
             VISHAL AGRAWAL<span>.</span>
