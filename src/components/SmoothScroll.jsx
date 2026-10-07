@@ -22,6 +22,7 @@ export default function SmoothScroll({ children }) {
       autoRaf: true,
     });
     window.__lenis = lenis;
+    if (document.body.style.overflow === "hidden") lenis.stop();
 
     function focusTarget(target) {
       if (!target) return;
@@ -32,19 +33,24 @@ export default function SmoothScroll({ children }) {
     }
 
     function scrollToTarget(target, { immediate = false } = {}) {
+      // Recalculate after a viewport or font change before resolving the anchor.
+      lenis.resize();
       if (immediate) {
-        lenis.scrollTo(target, { offset: -84, immediate: true });
+        lenis.scrollTo(target, { immediate: true, force: true });
       } else {
-        lenis.scrollTo(target, { offset: -84, duration: 1.4 });
+        // Lenis reads the root scroll-padding, including the responsive header.
+        lenis.scrollTo(target, { duration: 1.2 });
       }
     }
 
     function onClick(event) {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const anchor = event.target.closest('a[href^="#"]');
       if (!anchor) return;
       const id = anchor.getAttribute("href");
       if (!id || id.length < 2) return;
-      const target = document.querySelector(id);
+      let target;
+      try { target = document.getElementById(decodeURIComponent(id.slice(1))); } catch { return; }
       if (!target) return;
       event.preventDefault();
       scrollToTarget(target);
@@ -55,7 +61,8 @@ export default function SmoothScroll({ children }) {
 
     // Deep link on load (e.g. /#work): jump past the loader without animation.
     if (window.location.hash.length > 1) {
-      const initial = document.querySelector(window.location.hash);
+      let initial;
+      try { initial = document.getElementById(decodeURIComponent(window.location.hash.slice(1))); } catch { /* Ignore malformed URL fragments. */ }
       if (initial) {
         requestAnimationFrame(() => scrollToTarget(initial, { immediate: true }));
       }
