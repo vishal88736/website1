@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Lenis from "lenis";
 
 /**
@@ -11,8 +11,25 @@ import Lenis from "lenis";
  * - Exposes the instance on window.__lenis so modal/menu code can stop/start it.
  */
 export default function SmoothScroll({ children }) {
+  const [view, setView] = useState(() =>
+    new URLSearchParams(window.location.search).get("view") === "recruiter"
+      ? "recruiter"
+      : "explore",
+  );
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    function syncView() {
+      setView(document.documentElement.dataset.view || "explore");
+    }
+    window.addEventListener("portfolio:view-change", syncView);
+    syncView();
+    return () => window.removeEventListener("portfolio:view-change", syncView);
+  }, []);
+  useEffect(() => {
+    if (
+      view === "recruiter" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
 
     const lenis = new Lenis({
       duration: 1.15,
@@ -22,7 +39,11 @@ export default function SmoothScroll({ children }) {
       autoRaf: true,
     });
     window.__lenis = lenis;
-    if (document.body.style.overflow === "hidden") lenis.stop();
+    if (
+      document.body.style.overflow === "hidden" ||
+      document.documentElement.dataset.view === "recruiter"
+    )
+      lenis.stop();
 
     function focusTarget(target) {
       if (!target) return;
@@ -44,13 +65,26 @@ export default function SmoothScroll({ children }) {
     }
 
     function onClick(event) {
-      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (document.documentElement.dataset.view === "recruiter") return;
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return;
       const anchor = event.target.closest('a[href^="#"]');
       if (!anchor) return;
       const id = anchor.getAttribute("href");
       if (!id || id.length < 2) return;
       let target;
-      try { target = document.getElementById(decodeURIComponent(id.slice(1))); } catch { return; }
+      try {
+        target = document.getElementById(decodeURIComponent(id.slice(1)));
+      } catch {
+        return;
+      }
       if (!target) return;
       event.preventDefault();
       scrollToTarget(target);
@@ -59,12 +93,20 @@ export default function SmoothScroll({ children }) {
     }
     document.addEventListener("click", onClick);
 
-    // Deep link on load (e.g. /#work): jump past the loader without animation.
+    // Deep link on load (e.g. /#work): jump to the requested section without animation.
     if (window.location.hash.length > 1) {
       let initial;
-      try { initial = document.getElementById(decodeURIComponent(window.location.hash.slice(1))); } catch { /* Ignore malformed URL fragments. */ }
+      try {
+        initial = document.getElementById(
+          decodeURIComponent(window.location.hash.slice(1)),
+        );
+      } catch {
+        /* Ignore malformed URL fragments. */
+      }
       if (initial) {
-        requestAnimationFrame(() => scrollToTarget(initial, { immediate: true }));
+        requestAnimationFrame(() =>
+          scrollToTarget(initial, { immediate: true }),
+        );
       }
     }
 
@@ -73,7 +115,7 @@ export default function SmoothScroll({ children }) {
       lenis.destroy();
       if (window.__lenis === lenis) window.__lenis = undefined;
     };
-  }, []);
+  }, [view]);
 
   return children;
 }
@@ -83,5 +125,6 @@ export function stopSmooth() {
 }
 
 export function startSmooth() {
-  window.__lenis?.start();
+  if (document.documentElement.dataset.view !== "recruiter")
+    window.__lenis?.start();
 }
