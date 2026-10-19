@@ -7,13 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-} from "framer-motion";
+import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import { flushSync } from "react-dom";
 import {
   ArrowDown,
@@ -48,7 +42,11 @@ import {
   links,
 } from "./src/data/portfolio";
 import { startSmooth, stopSmooth } from "./src/components/SmoothScroll";
+import { useExploreMotion } from "./src/components/MotionSettings";
+import MotionControls from "./src/components/MotionControls";
+import ProjectStory from "./src/components/ProjectStory";
 import SystemCanvas from "./src/components/SystemCanvas";
+import { ClickFeedback, MagneticLink } from "./src/components/ElementMotion";
 import {
   KineticText,
   PointerSurface,
@@ -63,7 +61,9 @@ import ColorPalette, { PALETTES } from "./src/components/ColorPalette";
 import { Monogram } from "./src/components/Monogram";
 import "./src/styles/portfolio.css";
 import "./src/styles/motion.css";
+import "./src/styles/explore-features.css";
 import "./src/styles/recruiter.css";
+import "./src/styles/print.css";
 
 const EMAIL = links.email.replace("mailto:", "");
 const EASE = [0.22, 1, 0.36, 1];
@@ -149,87 +149,105 @@ const ProjectCard = forwardRef(function ProjectCard(
   { project, onOpen, index, featured },
   ref,
 ) {
-  const reduced = useReducedMotion();
+  const { reduced, subtle, full } = useExploreMotion();
   const ready = useContext(MotionReadyContext);
   const pointer = usePointerTilt(3);
+  const details = (
+    <>
+      <div className="project-meta">
+        <span>
+          {project.number} / {project.category}
+        </span>
+        {project.id === "sanjeevani" && (
+          <span className="project-award">
+            <Trophy size={12} /> 1st place
+          </span>
+        )}
+      </div>
+      <div className="project-title-row">
+        <h3>{project.title}</h3>
+        <a
+          className="icon-button project-source"
+          href={project.github}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={
+            project.github === links.github
+              ? `${project.title}: visit GitHub profile`
+              : `${project.title}: view repository`
+          }
+        >
+          <Github size={18} />
+        </a>
+      </div>
+      <p>{project.summary}</p>
+      <div className="chip-row">
+        {project.story.techStack.map((tech) => (
+          <span className="chip" key={tech}>
+            {tech}
+          </span>
+        ))}
+      </div>
+    </>
+  );
   return (
     <motion.article
-      {...pointer}
+      {...(featured ? {} : pointer)}
       ref={ref}
       layout={!reduced}
-      className={`project-card${featured ? " project-featured" : ""}`}
-      initial={reduced ? false : { opacity: 0, y: 20 }}
+      className={`project-card${featured ? " project-featured project-story" : ""}`}
+      initial={reduced ? false : { opacity: 0, y: subtle ? 12 : 64 }}
+      animate={reduced ? { opacity: 1, y: 0 } : undefined}
       whileInView={ready ? { opacity: 1, y: 0 } : undefined}
       whileHover={
-        reduced
+        !full || featured
           ? undefined
           : {
               y: -8,
               transition: { type: "spring", stiffness: 300, damping: 22 },
             }
       }
-      exit={{ opacity: 0 }}
-      viewport={{ once: true, amount: 0.08 }}
+      exit={{
+        opacity: 0,
+        transition: { duration: reduced ? 0 : 0.2, delay: 0 },
+      }}
+      viewport={{ once: true, amount: 0.08, margin: "0px 0px 8% 0px" }}
       transition={{
-        duration: reduced ? 0 : 0.55,
-        ease: EASE,
-        delay: reduced ? 0 : Math.min(index * 0.05, 0.15),
+        duration: reduced ? 0 : subtle ? 0.45 : 1.2,
+        ease: [0.16, 1, 0.3, 1],
+        delay: reduced ? 0 : Math.min(index * 0.08, 0.24),
+        layout: { type: "spring", stiffness: 130, damping: 25 },
       }}
     >
-      <button
-        className="project-image-button"
-        onClick={() => onOpen(project)}
-        aria-label={`Open ${project.title} case study`}
-      >
-        <ProjectPreview kind={project.id} />
-        <span className="preview-open">
-          <ArrowUpRight size={21} />
-        </span>
-      </button>
-      <div className="project-copy">
-        <div className="project-meta">
-          <span>
-            {project.number} / {project.category}
-          </span>
-          {project.id === "sanjeevani" && (
-            <span className="project-award">
-              <Trophy size={12} /> 1st place
-            </span>
-          )}
-        </div>
-        <div className="project-title-row">
-          <h3>{project.title}</h3>
-          <a
-            className="icon-button project-source"
-            href={project.github}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={
-              project.github === links.github
-                ? `${project.title}: visit GitHub profile`
-                : `${project.title}: view repository`
-            }
+      {featured ? (
+        <ProjectStory project={project} onOpen={onOpen}>
+          {details}
+        </ProjectStory>
+      ) : (
+        <>
+          <button
+            className="project-image-button"
+            onClick={() => onOpen(project)}
+            aria-label={`Open ${project.title} case study`}
           >
-            <Github size={18} />
-          </a>
-        </div>
-        <p>{project.summary}</p>
-        <div className="chip-row">
-          {project.story.techStack.map((tech) => (
-            <span className="chip" key={tech}>
-              {tech}
+            <ProjectPreview kind={project.id} />
+            <span className="preview-open">
+              <ArrowUpRight size={21} />
             </span>
-          ))}
-        </div>
-        <button className="case-link" onClick={() => onOpen(project)}>
-          Explore the project
-          <ArrowUpRight size={16} />
-        </button>
-      </div>
+          </button>
+          <div className="project-copy">
+            {details}
+            <button className="case-link" onClick={() => onOpen(project)}>
+              Explore the project
+              <ArrowUpRight size={16} />
+            </button>
+          </div>
+        </>
+      )}
     </motion.article>
   );
 });
-function CaseStudy({ project, onClose }) {
+function CaseStudy({ project, onClose, animated = false }) {
   const dialog = useRef(null);
   useEffect(() => {
     const el = dialog.current;
@@ -261,7 +279,7 @@ function CaseStudy({ project, onClose }) {
       }}
     >
       {project && (
-        <div className="case-content">
+        <div className={`case-content${animated ? " case-animated" : ""}`}>
           <div className="case-top">
             <span className="section-label">
               PROJECT {project.number} / {project.category}
@@ -463,20 +481,20 @@ function ContactForm({ notify }) {
   );
 }
 export default function Portfolio() {
-  const systemReduced = useReducedMotion();
+  const { reduced: motionOff, subtle, full } = useExploreMotion();
   const [theme, setTheme] = useState(
     () => document.documentElement.dataset.theme || "dark",
   );
   const [palette, setPalette] = useState(() => {
     const saved = document.documentElement.dataset.palette;
-    return PALETTES.some((option) => option.id === saved) ? saved : "volt";
+    return PALETTES.some((option) => option.id === saved) ? saved : "lavender";
   });
   const [view, setView] = useState(() =>
     new URLSearchParams(window.location.search).get("view") === "recruiter"
       ? "recruiter"
       : "explore",
   );
-  const reduced = systemReduced || view === "recruiter";
+  const reduced = motionOff || view === "recruiter";
   const hasExplored = useRef(view === "explore");
   const [loading, setLoading] = useState(() => view === "explore");
   const [introReady, setIntroReady] = useState(() => view === "recruiter");
@@ -532,7 +550,7 @@ export default function Portfolio() {
   }, [theme, palette, view]);
   function changeView(next) {
     if (view === next) return;
-    if (next === "explore" && document.startViewTransition && !systemReduced) {
+    if (next === "explore" && document.startViewTransition && full) {
       document.documentElement.dataset.transition = "view";
       const transition = document.startViewTransition(() =>
         flushSync(() => setView(next)),
@@ -588,7 +606,7 @@ export default function Portfolio() {
     function apply() {
       flushSync(() => setTheme(next));
     }
-    if (document.startViewTransition && !reduced) {
+    if (document.startViewTransition && full && view === "explore") {
       document.documentElement.dataset.transition = "theme";
       const rect = event.currentTarget.getBoundingClientRect();
       document.documentElement.style.setProperty(
@@ -621,13 +639,13 @@ export default function Portfolio() {
     };
   }, [introReady, menuOpen, selectedProject]);
   useEffect(() => {
-    if (!introReady || reduced || view === "recruiter") return;
+    if (!introReady || !full || view === "recruiter") return;
     const interval = setInterval(
       () => setRoleIndex((i) => (i + 1) % ROLES.length),
       3500,
     );
     return () => clearInterval(interval);
-  }, [introReady, reduced, view]);
+  }, [introReady, full, view]);
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -717,12 +735,18 @@ export default function Portfolio() {
     }
   }, [introReady]);
   const heroMotion = (delay) => ({
-    initial: reduced ? false : { opacity: 0, y: 32, filter: "blur(6px)" },
+    initial: reduced
+      ? false
+      : {
+          opacity: 0,
+          y: subtle ? 12 : 32,
+          filter: subtle ? "none" : "blur(6px)",
+        },
     animate: introReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : {},
     transition: {
-      duration: reduced ? 0 : 0.8,
+      duration: reduced ? 0 : subtle ? 0.4 : 0.8,
       ease: EASE,
-      delay: reduced ? 0 : delay,
+      delay: reduced ? 0 : subtle ? Math.min(delay, 0.1) : delay,
     },
   });
   return (
@@ -732,6 +756,7 @@ export default function Portfolio() {
           {loading && <LoadingScreen key="intro" onComplete={finishLoading} />}
         </AnimatePresence>
       )}
+      {view === "explore" && <ClickFeedback />}
       <a
         className="skip-link"
         href="#main"
@@ -803,6 +828,7 @@ export default function Portfolio() {
             {view === "explore" && (
               <>
                 <ColorPalette palette={palette} onChange={setPalette} />
+                <MotionControls />
                 <button
                   className="theme-toggle"
                   onClick={toggleTheme}
@@ -931,18 +957,18 @@ export default function Portfolio() {
                       initial={reduced ? false : { opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.25 }}
+                      transition={{ duration: reduced ? 0 : 0.25 }}
                     >
                       {ROLES[roleIndex]}
                     </motion.span>
                   </AnimatePresence>
                 </motion.div>
                 <motion.div className="hero-actions" {...heroMotion(0.3)}>
-                  <a className="button button-primary" href="#work">
+                  <MagneticLink className="button button-primary" href="#work">
                     View selected work
                     <ArrowDown size={16} />
-                  </a>
-                  <a
+                  </MagneticLink>
+                  <MagneticLink
                     className="button button-outline"
                     href={links.resume}
                     target="_blank"
@@ -950,7 +976,7 @@ export default function Portfolio() {
                   >
                     My resume
                     <ArrowUpRight size={16} />
-                  </a>
+                  </MagneticLink>
                 </motion.div>
                 <motion.div className="hero-socials" {...heroMotion(0.35)}>
                   <a
@@ -1058,8 +1084,19 @@ export default function Portfolio() {
                     key={item.id}
                     onClick={() => setFilter(item.id)}
                   >
-                    {item.label}
-                    <span>{item.count}</span>
+                    {filter === item.id && (
+                      <motion.span
+                        className="filter-highlight"
+                        layoutId={reduced ? undefined : "filter-highlight"}
+                        transition={{
+                          type: "spring",
+                          stiffness: 380,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+                    <span className="filter-label">{item.label}</span>
+                    <span className="filter-count">{item.count}</span>
                   </button>
                 ))}
               </div>
@@ -1362,13 +1399,14 @@ export default function Portfolio() {
                   <br />
                   <em>good company.</em>
                 </h2>
-                <a
+                <MagneticLink
+                  hoverRotate={45}
                   href={links.email}
                   className="contact-big-arrow"
                   aria-label="Email Vishal"
                 >
                   <ArrowUpRight />
-                </a>
+                </MagneticLink>
               </div>
               <p>
                 AI engineering roles, research collaborations,
@@ -1448,6 +1486,7 @@ export default function Portfolio() {
       </footer>
       <CaseStudy
         project={selectedProject}
+        animated={view === "explore" && !reduced}
         onClose={() => setSelectedProject(null)}
       />
       <AnimatePresence key={`toast-${view}`}>
@@ -1455,9 +1494,10 @@ export default function Portfolio() {
           <motion.div
             className="toast"
             role="status"
-            initial={{ opacity: 0, y: 20, x: "-50%" }}
+            initial={reduced ? false : { opacity: 0, y: 20, x: "-50%" }}
             animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: 10, x: "-50%" }}
+            exit={{ opacity: 0, y: reduced ? 0 : 10, x: "-50%" }}
+            transition={{ duration: reduced ? 0 : 0.25 }}
           >
             <Check size={16} />
             {toast}

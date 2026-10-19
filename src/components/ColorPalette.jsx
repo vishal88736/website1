@@ -1,19 +1,20 @@
+import { useExploreMotion } from "./MotionSettings";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, Palette, X } from "lucide-react";
 
 export const PALETTES = [
-  {
-    id: "volt",
-    name: "Volt",
-    color: "#c5f277",
-    description: "A fresh perspective",
-  },
   {
     id: "lavender",
     name: "Lavender",
     color: "#aa8cdc",
     description: "A little imagination",
+  },
+  {
+    id: "cocoa",
+    name: "Cocoa",
+    color: "#c39b78",
+    description: "Warm & earthy",
   },
   {
     id: "ocean",
@@ -40,7 +41,7 @@ export default function ColorPalette({ palette, onChange }) {
   const [open, setOpen] = useState(false);
   const root = useRef(null);
   const trigger = useRef(null);
-  const reduced = useReducedMotion();
+  const { reduced } = useExploreMotion();
 
   useEffect(() => {
     if (!open) return;

@@ -1,5 +1,6 @@
+import { useExploreMotion } from "./MotionSettings";
 import { useId, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowUpRight,
   Braces,
@@ -70,11 +71,70 @@ const SYSTEMS = [
   },
 ];
 
+const EXPLANATIONS = {
+  agents: [
+    "Start with the user's goal and the context needed to understand it.",
+    "Break the goal into a plan, route work to the right tools, and review the outcome.",
+    "Retrieve relevant information before deciding what to do next.",
+    "Run a scoped tool call to carry out the planned action.",
+    "Check the tool result against the original goal before returning an answer.",
+    "Return a useful result with a trace of the steps that produced it.",
+  ],
+  rag: [
+    "A natural-language question starts the retrieval process.",
+    "Embed the question, search the index, and rank the most relevant matches.",
+    "Prepare and index documents so their content can be retrieved.",
+    "Select relevant passages and include their source information in the context.",
+    "Generate an answer using the selected evidence rather than the question alone.",
+    "Connect the response to the sources used so the reader can inspect the evidence.",
+  ],
+  vision: [
+    "An image and its metadata enter the processing pipeline.",
+    "Coordinate preprocessing, inference, and inspection of the model output.",
+    "Restore image quality and resize inputs for the model.",
+    "Extract features and produce predictions from the prepared image.",
+    "Map predictions back to the image so their spatial context stays visible.",
+    "Present the analysis as interpretable information for the next decision.",
+  ],
+};
+
 export default function SystemCanvas() {
-  const reduced = useReducedMotion();
+  const { reduced } = useExploreMotion();
   const [selected, setSelected] = useState("agents");
+  const [step, setStep] = useState("core");
   const system = SYSTEMS.find((item) => item.id === selected);
   const uid = useId();
+  const stepIds = ["input", "core", "tool-0", "tool-1", "tool-2", "output"];
+  const labels = [
+    system.input[0],
+    system.core[0],
+    ...system.tools.map(([label]) => label),
+    system.output[0],
+  ];
+  const stepIndex = stepIds.indexOf(step);
+  const nodeProps = (id, label) => ({
+    role: "button",
+    tabIndex: 0,
+    "aria-label": `Inspect ${label}`,
+    "aria-pressed": step === id,
+    "aria-controls": `${uid}-detail`,
+    "data-active": step === id,
+    onClick: () => setStep(id),
+    onKeyDown: (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        setStep(id);
+      }
+    },
+  });
+  const branch = step.startsWith("tool-") ? Number(step.slice(-1)) : 0;
+  const x = [80, 220, 360][branch];
+  const signal =
+    step === "input"
+      ? "M220 53V86"
+      : step === "output"
+        ? "M80 241V265H220V286M220 241V286M360 241V265H220V286"
+        : `M220 53V86M220 144V161H${x}V185M${x} 241V265H220V286`;
 
   return (
     <div className="system-canvas">
@@ -95,7 +155,10 @@ export default function SystemCanvas() {
             key={id}
             type="button"
             aria-pressed={selected === id}
-            onClick={() => setSelected(id)}
+            onClick={() => {
+              setSelected(id);
+              setStep("core");
+            }}
           >
             {selected === id && (
               <motion.span
@@ -112,11 +175,17 @@ export default function SystemCanvas() {
           </button>
         ))}
       </div>
-      <div className="canvas-diagram" aria-hidden="true">
-        <span className="canvas-axis axis-top">
+      <div className="canvas-diagram">
+        <span className="canvas-axis axis-top" aria-hidden="true">
           INPUT → REASONING → OUTCOME
         </span>
-        <svg key={system.id} viewBox="0 0 440 332" fill="none">
+        <svg
+          key={system.id}
+          viewBox="0 0 440 332"
+          fill="none"
+          role="group"
+          aria-label={`${system.label}: select a step to inspect`}
+        >
           <defs>
             <marker
               id={`${uid}-arrow`}
@@ -135,20 +204,52 @@ export default function SystemCanvas() {
               />
             </marker>
           </defs>
-          <g className="system-connections" markerEnd={`url(#${uid}-arrow)`}>
-            <path pathLength="1" d="M220 53V86" />
-            <path pathLength="1" d="M220 144V161H80V185" />
-            <path pathLength="1" d="M220 144V185" />
-            <path pathLength="1" d="M220 144V161H360V185" />
-            <path pathLength="1" d="M80 241V265H220V286" />
-            <path pathLength="1" d="M220 241V286" />
-            <path pathLength="1" d="M360 241V265H220V286" />
+          <g
+            className="system-connections"
+            aria-hidden="true"
+            markerEnd={`url(#${uid}-arrow)`}
+          >
+            <path
+              pathLength="1"
+              data-active={step === "input" || step === "core"}
+              d="M220 53V86"
+            />
+            <path
+              pathLength="1"
+              data-active={step === "core" || step === "tool-0"}
+              d="M220 144V161H80V185"
+            />
+            <path
+              pathLength="1"
+              data-active={step === "core" || step === "tool-1"}
+              d="M220 144V185"
+            />
+            <path
+              pathLength="1"
+              data-active={step === "core" || step === "tool-2"}
+              d="M220 144V161H360V185"
+            />
+            <path
+              pathLength="1"
+              data-active={step === "output" || step === "tool-0"}
+              d="M80 241V265H220V286"
+            />
+            <path
+              pathLength="1"
+              data-active={step === "output" || step === "tool-1"}
+              d="M220 241V286"
+            />
+            <path
+              pathLength="1"
+              data-active={step === "output" || step === "tool-2"}
+              d="M360 241V265H220V286"
+            />
           </g>
-          <path
-            className="system-signal"
-            d="M220 53V86M220 144V161H80V185M80 241V265H220V286"
-          />
-          <g className="diagram-input">
+          <path className="system-signal" aria-hidden="true" d={signal} />
+          <g
+            className="diagram-input diagram-node"
+            {...nodeProps("input", system.input[0])}
+          >
             <rect x="148" y="9" width="144" height="44" rx="6" />
             <text x="220" y="28" textAnchor="middle">
               {system.input[0]}
@@ -157,7 +258,10 @@ export default function SystemCanvas() {
               {system.input[1]}
             </text>
           </g>
-          <g className="diagram-core">
+          <g
+            className="diagram-core diagram-node"
+            {...nodeProps("core", system.core[0])}
+          >
             <rect x="114" y="86" width="212" height="58" rx="8" />
             <rect x="122" y="94" width="42" height="42" rx="5" />
             <Workflow x="133" y="105" size={20} />
@@ -170,7 +274,11 @@ export default function SystemCanvas() {
             <circle cx="310" cy="99" r="3" />
           </g>
           {system.tools.map(([title, detail, Icon], i) => (
-            <g className="diagram-tool" key={`${system.id}-${title}`}>
+            <g
+              className="diagram-tool diagram-node"
+              key={`${system.id}-${title}`}
+              {...nodeProps(`tool-${i}`, title)}
+            >
               <rect x={19 + i * 140} y="185" width="122" height="56" rx="6" />
               <Icon x={29 + i * 140} y="196" size={14} />
               <text x={50 + i * 140} y="207">
@@ -182,7 +290,10 @@ export default function SystemCanvas() {
               <circle cx={80 + i * 140} cy="185" r="3" />
             </g>
           ))}
-          <g className="diagram-output">
+          <g
+            className="diagram-output diagram-node"
+            {...nodeProps("output", system.output[0])}
+          >
             <rect x="135" y="286" width="170" height="44" rx="6" />
             <CircleCheck x="146" y="296" size={15} />
             <text x="171" y="303">
@@ -200,10 +311,23 @@ export default function SystemCanvas() {
           1:1
         </span>
       </div>
-      <div className="canvas-caption" aria-live="polite" aria-atomic="true">
+      <div className="canvas-caption">
         <span>{system.tag}</span>
         <h2>{system.title}</h2>
         <p>{system.description}</p>
+        <div
+          className="canvas-step-detail"
+          id={`${uid}-detail`}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <span>
+            STEP {String(stepIndex + 1).padStart(2, "0")} / SELECT A NODE ABOVE
+          </span>
+          <h3>{labels[stepIndex]}</h3>
+          <p>{EXPLANATIONS[system.id][stepIndex]}</p>
+        </div>
       </div>
       <a className="canvas-link" href="#work">
         <span>From sketches to working systems</span>

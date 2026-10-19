@@ -6,6 +6,7 @@ import {
   Linkedin,
   Mail,
   MapPin,
+  Printer,
 } from "lucide-react";
 import { expertise, links, milestones, projects } from "../data/portfolio";
 import { Monogram } from "./Monogram";
@@ -82,6 +83,17 @@ export default function RecruiterView({ onOpenProject, menuOpen }) {
             Email me
             <ArrowUpRight size={14} />
           </a>
+          <button
+            type="button"
+            className="button button-outline recruiter-print"
+            onClick={() => window.print()}
+          >
+            <Printer size={15} />
+            Print / Save PDF
+          </button>
+          <p className="recruiter-print-hint">
+            Choose “Save as PDF” in your print dialog.
+          </p>
           <a className="recruiter-jump" href="#work">
             Jump to projects
             <ArrowDown size={13} />

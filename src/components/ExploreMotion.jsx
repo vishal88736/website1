@@ -1,9 +1,9 @@
-import { useContext, useRef } from "react";
+import { useExploreMotion } from "./MotionSettings";
+import { useContext, useEffect, useRef } from "react";
 import {
   motion,
   useInView,
   useMotionValue,
-  useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
@@ -12,7 +12,7 @@ import { MotionReadyContext } from "./MotionReveal";
 
 // Local motion values keep pointer effects off React's render path.
 export function usePointerTilt(strength = 4) {
-  const reduced = useReducedMotion();
+  const { full } = useExploreMotion();
   const tiltX = useMotionValue(0);
   const tiltY = useMotionValue(0);
   const rotateX = useSpring(tiltX, { stiffness: 180, damping: 22 });
@@ -25,9 +25,12 @@ export function usePointerTilt(strength = 4) {
     tiltY.set(0);
     active.set(0);
   }
+  useEffect(() => {
+    if (!full) reset();
+  }, [full]);
   return {
-    style: reduced
-      ? undefined
+    style: !full
+      ? { rotateX: 0, rotateY: 0, "--pointer-active": 0 }
       : {
           rotateX,
           rotateY,
@@ -38,7 +41,7 @@ export function usePointerTilt(strength = 4) {
         },
     onPointerMove(event) {
       if (
-        reduced ||
+        !full ||
         event.pointerType !== "mouse" ||
         !window.matchMedia("(hover: hover) and (pointer: fine)").matches
       )
@@ -75,7 +78,7 @@ export function PointerSurface({ children, className = "", strength = 5 }) {
 
 export function ScrollScene({ children, ...props }) {
   const ref = useRef(null);
-  const reduced = useReducedMotion();
+  const { full } = useExploreMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -88,8 +91,8 @@ export function ScrollScene({ children, ...props }) {
       {...props}
       ref={ref}
       style={
-        reduced
-          ? undefined
+        !full
+          ? { "--art-drift": "0px", "--copy-drift": "0px" }
           : { "--art-drift": artDrift, "--copy-drift": copyDrift }
       }
     >
@@ -103,8 +106,14 @@ export function ScrollScene({ children, ...props }) {
 export function KineticText({ text, delay = 0 }) {
   const ref = useRef(null);
   const ready = useContext(MotionReadyContext);
-  const reduced = useReducedMotion();
+  const { full } = useExploreMotion();
   const visible = useInView(ref, { once: true, amount: 0.2 });
+  if (!full)
+    return (
+      <span className="kinetic-line" ref={ref}>
+        {text}
+      </span>
+    );
   return (
     <span className="kinetic-line" ref={ref}>
       <span className="sr-only">{text}</span>
@@ -113,12 +122,12 @@ export function KineticText({ text, delay = 0 }) {
           <motion.span
             key={`${i}-${letter}`}
             className="kinetic-character"
-            initial={reduced ? false : { y: "115%", rotateX: -70, opacity: 0 }}
+            initial={{ y: "115%", rotateX: -70, opacity: 0 }}
             animate={
               ready && visible ? { y: "0%", rotateX: 0, opacity: 1 } : undefined
             }
             whileHover={
-              reduced
+              !full
                 ? undefined
                 : {
                     y: -7,
@@ -126,8 +135,8 @@ export function KineticText({ text, delay = 0 }) {
                   }
             }
             transition={{
-              duration: reduced ? 0 : 0.75,
-              delay: reduced ? 0 : delay + i * 0.028,
+              duration: 0.75,
+              delay: delay + i * 0.028,
               ease: [0.22, 1, 0.36, 1],
             }}
           >

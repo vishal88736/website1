@@ -1,17 +1,18 @@
+import { useExploreMotion } from "./MotionSettings";
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Monogram } from "./Monogram";
 
 export default function LoadingScreen({ onComplete }) {
-  const reduced = useReducedMotion();
+  const { reduced, subtle, full } = useExploreMotion();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let disposed = false;
     let minimumTimer, deadlineTimer, exitTimer;
     const minimum = new Promise((resolve) => {
-      minimumTimer = setTimeout(resolve, reduced ? 180 : 900);
+      minimumTimer = setTimeout(resolve, full ? 900 : 180);
     });
     const deadline = new Promise((resolve) => {
       deadlineTimer = setTimeout(resolve, 1800);
@@ -21,7 +22,7 @@ export default function LoadingScreen({ onComplete }) {
       if (disposed) return;
       clearTimeout(deadlineTimer);
       setReady(true);
-      exitTimer = setTimeout(onComplete, reduced ? 0 : 280);
+      exitTimer = setTimeout(onComplete, full ? 280 : 0);
     });
     function keyboard(event) {
       if (event.key === "Escape") onComplete();
@@ -32,14 +33,17 @@ export default function LoadingScreen({ onComplete }) {
       [minimumTimer, deadlineTimer, exitTimer].forEach(clearTimeout);
       document.removeEventListener("keydown", keyboard);
     };
-  }, [onComplete, reduced]);
+  }, [onComplete, reduced, full]);
 
   return (
     <motion.div
       className={`loading-screen${ready ? " is-ready" : ""}`}
       initial={false}
-      exit={reduced ? { opacity: 0 } : { y: "-100%" }}
-      transition={{ duration: reduced ? 0 : 0.65, ease: [0.76, 0, 0.24, 1] }}
+      exit={!full ? { opacity: 0 } : { y: "-100%" }}
+      transition={{
+        duration: reduced ? 0 : subtle ? 0.2 : 0.65,
+        ease: [0.76, 0, 0.24, 1],
+      }}
     >
       <div className="loading-top">
         <span>VISHAL AGRAWAL</span>

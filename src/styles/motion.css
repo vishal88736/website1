@@ -98,7 +98,7 @@
 @keyframes node-arrive { from { opacity: 0; transform: translateY(13px) scale(0.96); } to { opacity: 1; transform: none; } }
 @keyframes connection-draw { to { stroke-dashoffset: 0; } }
 
-/* Explore's headline, statistics, and depth react to the visitor. */
+/* Explore's headline and depth react to the visitor. */
 .kinetic-line { display: inline-block; vertical-align: bottom; overflow: clip; padding: 0.12em 0; margin: -0.12em 0; }
 .kinetic-characters { display: inline-flex; white-space: nowrap; perspective: 700px; }
 .kinetic-character { display: inline-block; transform-origin: 50% 100%; }
@@ -124,6 +124,51 @@
 @keyframes section-signal { 0%,100% { left: 0; opacity: 0; } 10%,75% { opacity: 0.7; } 85% { left: calc(100% - 160px); opacity: 0; } }
 @keyframes skill-arrive { from { opacity: 0.3; translate: 0 7px; } to { opacity: 1; translate: 0 0; } }
 @keyframes signature-light { 0%,100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+
+/* Additional element motion belongs only to Explore. */
+[data-view="explore"] .magnetic-link { touch-action: manipulation; }
+.click-feedback { position: fixed; inset: 0; pointer-events: none; z-index: 180; overflow: hidden; }
+.click-feedback-ring { position: absolute; width: 70px; height: 70px; margin: -35px 0 0 -35px; border: 1px solid var(--accent); border-radius: 50%; background: radial-gradient(circle,transparent 35%,var(--accent-soft) 70%,transparent 72%); animation: control-ripple 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+@keyframes control-ripple { from { opacity: 0.8; transform: scale(0.2); } to { opacity: 0; transform: scale(1.4); } }
+[data-view="explore"] .project-filters button { position: relative; isolation: isolate; }
+[data-view="explore"] .project-filters button.is-selected { background: transparent; border-color: transparent; }
+[data-view="explore"] .project-filters .filter-highlight { position: absolute; inset: 0; z-index: -1; background: var(--surface-alt); border: 1px solid var(--line); border-radius: inherit; pointer-events: none; }
+[data-view="explore"] .project-filters .filter-label { font: inherit; opacity: 1; }
+[data-view="explore"] .case-animated > :is(h2,.case-tagline,.project-preview,.case-story,.case-architecture,.case-challenge,.case-results,.chip-row,.button) { animation: case-detail-enter 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+[data-view="explore"] .case-animated > .case-tagline { animation-delay: 0.04s; }
+[data-view="explore"] .case-animated > .project-preview { animation-delay: 0.08s; }
+[data-view="explore"] .case-animated > .case-story { animation-delay: 0.12s; }
+[data-view="explore"] .case-animated > .case-architecture { animation-delay: 0.16s; }
+[data-view="explore"] .case-animated > .case-results { animation-delay: 0.2s; }
+@keyframes case-detail-enter { from { opacity: 0.65; translate: 0 18px; } to { opacity: 1; translate: 0 0; } }
+[data-view="explore"] .project-image-button:is(:hover,:focus-visible) .voice-wave i { animation-duration: 0.65s; }
+[data-view="explore"] .project-image-button:is(:hover,:focus-visible) .voice-orb > svg { animation: preview-icon-bounce 0.9s ease-in-out infinite; }
+[data-view="explore"] .project-image-button:is(:hover,:focus-visible) .code-lines > div { animation: code-line-reveal 0.6s cubic-bezier(0.22,1,0.36,1) both; animation-delay: var(--preview-delay,0s); }
+[data-view="explore"] .code-lines > div:nth-child(2) { --preview-delay: 0.04s; }
+[data-view="explore"] .code-lines > div:nth-child(3) { --preview-delay: 0.08s; }
+[data-view="explore"] .code-lines > div:nth-child(4) { --preview-delay: 0.12s; }
+[data-view="explore"] .code-lines > div:nth-child(5) { --preview-delay: 0.16s; }
+[data-view="explore"] .code-lines > div:nth-child(6) { --preview-delay: 0.2s; }
+[data-view="explore"] .project-image-button:is(:hover,:focus-visible) .graph-edges path { stroke-dasharray: 6 5; animation: graph-signal 1.6s linear infinite; }
+[data-view="explore"] .project-image-button:is(:hover,:focus-visible) .talent-agents > span { animation: preview-row-enter 0.45s cubic-bezier(0.22,1,0.36,1) both; animation-delay: var(--preview-delay,0s); }
+[data-view="explore"] .talent-agents > span:nth-child(2) { --preview-delay: 0.08s; }
+[data-view="explore"] .talent-agents > span:nth-child(3) { --preview-delay: 0.16s; }
+[data-view="explore"] .field-map::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(180deg,transparent 47%,#b7e5ba40 49%,#d5ffd8b0 50%,transparent 53%); }
+[data-view="explore"] .project-image-button:is(:hover,:focus-visible) .field-map::after { opacity: 1; animation: field-sweep 2.4s ease-in-out infinite; }
+[data-view="explore"] .project-image-button:is(:hover,:focus-visible) .chart-stroke { animation: chart-replay 1.2s cubic-bezier(0.22,1,0.36,1) both; }
+[data-view="explore"] .project-image-button:is(:hover,:focus-visible) .finance-ledger > div { animation: ledger-confirm 0.6s ease both; animation-delay: var(--preview-delay,0s); }
+[data-view="explore"] .finance-ledger > div:nth-child(2) { --preview-delay: 0.1s; }
+[data-view="explore"] .finance-ledger > div:nth-child(3) { --preview-delay: 0.2s; }
+[data-view="explore"] .expertise-card:is(:hover,:focus-within) .expertise-icon > svg { animation: preview-icon-bounce 0.7s ease both; }
+[data-view="explore"] .lab-card:is(:hover,:focus-within) .lab-top > svg { animation: experiment-sway 1.4s ease-in-out infinite; }
+@keyframes preview-icon-bounce { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-5px) scale(1.08); } 70% { transform: translateY(1px); } }
+@keyframes code-line-reveal { from { clip-path: inset(0 100% 0 0); opacity: 0.6; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
+@keyframes graph-signal { to { stroke-dashoffset: -44; } }
+@keyframes preview-row-enter { from { translate: 9px 0; opacity: 0.6; } to { translate: 0 0; opacity: 1; } }
+@keyframes field-sweep { 0%,100% { transform: translateY(-35%); } 50% { transform: translateY(35%); } }
+@keyframes chart-replay { from { stroke-dashoffset: 700; } to { stroke-dashoffset: 0; } }
+@keyframes ledger-confirm { 0% { background: #bac7e712; translate: 4px 0; } 50% { background: #b7ddca20; } 100% { background: transparent; translate: 0 0; } }
+@keyframes experiment-sway { 0%,100% { transform: rotate(0); } 30% { transform: rotate(-12deg); } 65% { transform: rotate(9deg); } }
 
 @media (max-width: 600px) {
   .loading-screen { padding: 25px 24px; }

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useMotionSettings } from "./MotionSettings";
 import Lenis from "lenis";
 
 /**
@@ -11,6 +12,8 @@ import Lenis from "lenis";
  * - Exposes the instance on window.__lenis so modal/menu code can stop/start it.
  */
 export default function SmoothScroll({ children }) {
+  const { level } = useMotionSettings();
+  const initialHashHandled = useRef(false);
   const [view, setView] = useState(() =>
     new URLSearchParams(window.location.search).get("view") === "recruiter"
       ? "recruiter"
@@ -25,11 +28,10 @@ export default function SmoothScroll({ children }) {
     return () => window.removeEventListener("portfolio:view-change", syncView);
   }, []);
   useEffect(() => {
-    if (
-      view === "recruiter" ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
+    if (view === "recruiter" || level !== "full") {
+      initialHashHandled.current = true;
       return;
+    }
 
     const lenis = new Lenis({
       duration: 1.15,
@@ -94,7 +96,8 @@ export default function SmoothScroll({ children }) {
     document.addEventListener("click", onClick);
 
     // Deep link on load (e.g. /#work): jump to the requested section without animation.
-    if (window.location.hash.length > 1) {
+    let hashFrame;
+    if (!initialHashHandled.current && window.location.hash.length > 1) {
       let initial;
       try {
         initial = document.getElementById(
@@ -104,18 +107,20 @@ export default function SmoothScroll({ children }) {
         /* Ignore malformed URL fragments. */
       }
       if (initial) {
-        requestAnimationFrame(() =>
-          scrollToTarget(initial, { immediate: true }),
-        );
-      }
-    }
+        hashFrame = requestAnimationFrame(() => {
+          scrollToTarget(initial, { immediate: true });
+          initialHashHandled.current = true;
+        });
+      } else initialHashHandled.current = true;
+    } else initialHashHandled.current = true;
 
     return () => {
+      cancelAnimationFrame(hashFrame);
       document.removeEventListener("click", onClick);
       lenis.destroy();
       if (window.__lenis === lenis) window.__lenis = undefined;
     };
-  }, [view]);
+  }, [view, level]);
 
   return children;
 }
