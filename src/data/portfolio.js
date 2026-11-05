@@ -1,7 +1,157 @@
 export const projects = [
   {
+    "id": "canopy",
+    "number": "01",
+    "title": "Canopy",
+    "tagline": "Project details in preparation",
+    "category": "Project",
+    "draft": true,
+    "summary": "Canopy is reserved for a full project case study. The technical scope, implementation, and results will be added once confirmed.",
+    "story": {
+      "problem": "Project goals have not yet been provided.",
+      "solution": "Implementation details are pending verification.",
+      "architecture": [],
+      "challenge": "Details pending.",
+      "results": [],
+      "techStack": []
+    }
+  },
+  {
+    "id": "krono",
+    "number": "02",
+    "title": "Krono",
+    "tagline": "Project details in preparation",
+    "category": "Project",
+    "draft": true,
+    "summary": "Krono is reserved for a full project case study. The technical scope, implementation, and results will be added once confirmed.",
+    "story": {
+      "problem": "Project goals have not yet been provided.",
+      "solution": "Implementation details are pending verification.",
+      "architecture": [],
+      "challenge": "Details pending.",
+      "results": [],
+      "techStack": []
+    }
+  },
+  {
+    "id": "nagarseva",
+    "number": "03",
+    "title": "NagarSeva First · UrbanSaarthi",
+    "tagline": "Settlement Intelligence and Basic-Service Assurance",
+    "category": "Civic Technology",
+    "summary": "A multilingual civic-tech prototype that maps fictional settlements, tracks housing and service gaps, manages issue reports, and follows redevelopment progress through one shared workspace.",
+    "story": {
+      "problem": "Housing needs, service coverage, resident issues, and redevelopment follow-up are often examined separately, making it hard to keep settlement context consistent across workflows.",
+      "solution": "Built UrbanSaarthi as an integrated demonstration workspace for settlement exploration, issue tracking, housing assessments, six basic services, site visits, project milestones, and reports. Its datasets and identities are explicitly fictional, not official government records.",
+      "architecture": [
+        {
+          "stage": "Civic Interface",
+          "tech": "React / TypeScript",
+          "detail": "Connects dashboard, issues, housing, redevelopment, reports, and data-onboarding workflows."
+        },
+        {
+          "stage": "Interactive Maps",
+          "tech": "Leaflet / GeoJSON",
+          "detail": "Visualizes synthetic settlements and filters records by location, services, and risk."
+        },
+        {
+          "stage": "API and Validation",
+          "tech": "FastAPI / Pydantic",
+          "detail": "Validates inputs and supports controlled updates, imports, provenance, and rollback."
+        },
+        {
+          "stage": "Shared Persistence",
+          "tech": "SQLite",
+          "detail": "Stores the synthetic civic workspace and its recorded issue and project history."
+        },
+        {
+          "stage": "Cloud Deployment",
+          "tech": "AWS CloudFront / EC2 / Docker",
+          "detail": "Serves the React application and API together from one public origin."
+        }
+      ],
+      "challenge": "Coordinating map, reports, and civic workflows against one consistent server-backed dataset, while clearly separating a usable demo from unverified real-world data.",
+      "results": [
+        "English, Hindi and Marathi interface",
+        "Housing, six-service, issue and project workflows",
+        "AWS-hosted interactive demo with synthetic data"
+      ],
+      "techStack": [
+        "React",
+        "TypeScript",
+        "Leaflet",
+        "FastAPI",
+        "Python",
+        "SQLite",
+        "Docker",
+        "AWS EC2",
+        "CloudFront"
+      ]
+    },
+    "github": "https://github.com/vishal88736/nagarseva-seva-first",
+    "demo": "https://d2nrwxy6sjb9o8.cloudfront.net/"
+  },
+  {
+    "id": "cmapss",
+    "number": "04",
+    "title": "GRACE-RUL · CMAPSS Predictive Maintenance",
+    "tagline": "Fault-Aware Turbofan Remaining Useful Life Prediction",
+    "category": "Predictive Maintenance",
+    "summary": "A research-oriented PyTorch pipeline built around NASA C-MAPSS FD001–FD004 to detect damaged sensor readings, selectively recover degradation signals, and predict engine remaining useful life with uncertainty reporting.",
+    "story": {
+      "problem": "A degraded engine and a corrupted sensor can produce similar warning patterns. Faulty or correlated sensor readings can undermine remaining useful life predictions.",
+      "solution": "Developed a shared sensor-quality and RUL workflow that simulates structured sensor faults, detects unreliable measurements, gates recovery of corrupted readings, predicts RUL, and calibrates uncertainty intervals with engine-separated evaluation.",
+      "architecture": [
+        {
+          "stage": "Engine Trajectories",
+          "tech": "NASA C-MAPSS FD001–FD004",
+          "detail": "Preprocesses sensor histories by operating regime and constructs temporal training windows."
+        },
+        {
+          "stage": "Fault Simulation",
+          "tech": "Structured Sensor Corruption",
+          "detail": "Models missingness, outages, noise, bias, drift, stuck-at readings, and related-sensor faults."
+        },
+        {
+          "stage": "Fault Detection",
+          "tech": "Sensor Quality Module",
+          "detail": "Scores sensor damage and identifies when incoming readings should not be trusted."
+        },
+        {
+          "stage": "Selective Recovery",
+          "tech": "Residual BiLSTM / WGAN-GP",
+          "detail": "Reconstructs supported corrupted measurements while protecting intact readings and degradation trends."
+        },
+        {
+          "stage": "RUL and Confidence",
+          "tech": "CNN–GRU / Transformer",
+          "detail": "Predicts remaining useful life with quality gating, engine-level calibration and optional SHAP/LIME explanations."
+        }
+      ],
+      "challenge": "Separating physical degradation from sensor corruption while avoiding unsafe overcorrection and evaluating uncertainty without leaking information across engines.",
+      "results": [
+        "FD001–FD004 training and evaluation workflow",
+        "Structured correlated-fault detection and selective recovery",
+        "RUL predictions, intervals, and model explanations"
+      ],
+      "techStack": [
+        "Python",
+        "PyTorch",
+        "NASA C-MAPSS",
+        "CNN–GRU",
+        "Transformer",
+        "BiLSTM",
+        "WGAN-GP",
+        "FastAPI",
+        "SHAP",
+        "LIME"
+      ]
+    },
+    "github": "https://github.com/vishal88736/cmapss-predictive-maintenance"
+  },
+  {
     id: "sanjeevani",
-    number: "01",
+    number: "05",
     title: "Sanjeevani",
     tagline: "Multilingual Voice-First Healthcare AI Triage",
     category: "Healthcare AI",
@@ -64,7 +214,7 @@ export const projects = [
   },
   {
     id: "codrix",
-    number: "02",
+    number: "06",
     title: "Codrix.AI",
     tagline: "Codebase Intelligence & AST Knowledge Graph",
     category: "Code Intelligence",
@@ -125,7 +275,7 @@ export const projects = [
   },
   {
     id: "careertrajectory",
-    number: "03",
+    number: "07",
     title: "CareerTrajectory AI",
     tagline: "Redefining Talent Intelligence Beyond Traditional ATS",
     category: "Talent Intelligence",
@@ -192,7 +342,7 @@ export const projects = [
   },
   {
     id: "cottonfield",
-    number: "04",
+    number: "08",
     title: "Cotton Field Analysis",
     tagline:
       "AI-Powered Crop Intelligence from High-Resolution Orthomosaic Imagery",
@@ -258,7 +408,7 @@ export const projects = [
   },
   {
     id: "alpaca",
-    number: "05",
+    number: "09",
     title: "Alpaca Trading Agentic AI",
     tagline: "Signal/Terminal — Autonomous AI Trading on Alpaca Paper Trading",
     category: "Agentic Trading",
@@ -321,7 +471,7 @@ export const projects = [
   },
   {
     id: "finance",
-    number: "06",
+    number: "10",
     title: "Razorpay Finance Controller",
     tagline: "AI Finance Controller — Deterministic Truth, Agentic Investigation",
     category: "AI Finance",
