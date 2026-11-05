@@ -93,8 +93,8 @@ const MARQUEE = [
   "FastAPI",
 ];
 const FILTERS = [
-  { label: "All projects", id: "all", count: "06" },
-  { label: "AI & agents", id: "ai", count: "05" },
+  { label: "All projects", id: "all", count: String(projects.length).padStart(2, "0") },
+  { label: "AI & systems", id: "ai", count: String(projects.filter((p) => !p.draft && p.id !== "cottonfield").length).padStart(2, "0") },
   { label: "Computer vision", id: "vision", count: "01" },
 ];
 
@@ -178,8 +178,9 @@ const ProjectCard = forwardRef(function ProjectCard(
     >
       <button
         className="project-image-button"
-        onClick={() => onOpen(project)}
-        aria-label={`Open ${project.title} case study`}
+        onClick={() => !project.draft && onOpen(project)}
+        disabled={project.draft}
+        aria-label={project.draft ? `${project.title} details pending` : `Open ${project.title} case study`}
       >
         <ProjectPreview kind={project.id} />
         <span className="preview-open">
@@ -199,7 +200,7 @@ const ProjectCard = forwardRef(function ProjectCard(
         </div>
         <div className="project-title-row">
           <h3>{project.title}</h3>
-          <a
+          {!project.draft && <a
             className="icon-button project-source"
             href={project.github}
             target="_blank"
@@ -211,7 +212,7 @@ const ProjectCard = forwardRef(function ProjectCard(
             }
           >
             <Github size={18} />
-          </a>
+          </a>}
         </div>
         <p>{project.summary}</p>
         <div className="chip-row">
@@ -221,10 +222,10 @@ const ProjectCard = forwardRef(function ProjectCard(
             </span>
           ))}
         </div>
-        <button className="case-link" onClick={() => onOpen(project)}>
+        {project.draft ? <span className="case-link">Details forthcoming</span> : <button className="case-link" onClick={() => onOpen(project)}>
           Explore the project
           <ArrowUpRight size={16} />
-        </button>
+        </button>}
       </div>
     </motion.article>
   );
@@ -330,6 +331,7 @@ function CaseStudy({ project, onClose }) {
               </span>
             ))}
           </div>
+          {project.demo && <a className="button button-primary" href={project.demo} target="_blank" rel="noreferrer">Live demo <ArrowUpRight size={16} /></a>}
           <a
             className="button button-primary"
             href={project.github}
@@ -512,7 +514,7 @@ export default function Portfolio() {
   const visibleProjects = projects.filter(
     (p) =>
       filter === "all" ||
-      (filter === "vision" ? p.id === "cottonfield" : p.id !== "cottonfield"),
+      (filter === "vision" ? p.id === "cottonfield" : !p.draft && p.id !== "cottonfield"),
   );
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
