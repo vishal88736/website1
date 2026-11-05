@@ -7,7 +7,13 @@ import {
   Mail,
   MapPin,
 } from "lucide-react";
-import { expertise, links, milestones, projects } from "../data/portfolio";
+import {
+  expertise,
+  links,
+  milestones,
+  projects,
+  upcoming,
+} from "../data/portfolio";
 import { Monogram } from "./Monogram";
 
 export default function RecruiterView({ onOpenProject, menuOpen }) {
@@ -89,25 +95,6 @@ export default function RecruiterView({ onOpenProject, menuOpen }) {
         </div>
       </section>
 
-      <div className="recruiter-stats" aria-label="Career highlights">
-        <div>
-          <strong>{String(projects.length).padStart(2, "0")}</strong>
-          <span>Selected AI & engineering projects</span>
-        </div>
-        <div>
-          <strong>1st</strong>
-          <span>AI Durg & Gemma 4 Hackathon</span>
-        </div>
-        <div>
-          <strong>200+</strong>
-          <span>Programming problems solved</span>
-        </div>
-        <div>
-          <strong>{String(expertise.length).padStart(2, "0")}</strong>
-          <span>Areas in my engineering toolkit</span>
-        </div>
-      </div>
-
       <div className="recruiter-layout">
         <div className="recruiter-main-column">
           <section
@@ -128,6 +115,9 @@ export default function RecruiterView({ onOpenProject, menuOpen }) {
                   <h3>{project.title}</h3>
                   <p className="recruiter-project-tagline">{project.tagline}</p>
                   <p>{project.summary}</p>
+                  {project.scope && (
+                    <p className="project-scope">{project.scope}</p>
+                  )}
                   <div className="chip-row">
                     {project.story.techStack.slice(0, 4).map((tech) => (
                       <span className="chip" key={tech}>
@@ -150,6 +140,12 @@ export default function RecruiterView({ onOpenProject, menuOpen }) {
                         : "Source"}
                       <ArrowUpRight size={12} />
                     </a>
+                    {project.demo && (
+                      <a href={project.demo} target="_blank" rel="noreferrer">
+                        Live demo
+                        <ArrowUpRight size={13} />
+                      </a>
+                    )}
                   </div>
                 </article>
               ))}
@@ -178,6 +174,26 @@ export default function RecruiterView({ onOpenProject, menuOpen }) {
           </section>
         </div>
         <aside className="recruiter-sidebar">
+          <section
+            className="recruiter-panel recruiter-building"
+            aria-labelledby="recruiter-building-title"
+          >
+            <h2 id="recruiter-building-title">Currently building</h2>
+            {upcoming.map((item) => (
+              <article className="recruiter-building-item" key={item.id}>
+                <span className="recruiter-eyebrow">{item.status}</span>
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+                <div className="chip-row">
+                  {item.tech.map((tech) => (
+                    <span className="chip" key={tech}>
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </section>
           <section
             className="recruiter-panel"
             id="about"

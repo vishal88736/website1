@@ -46,6 +46,8 @@ import {
   upcoming,
   milestones,
   links,
+  projectFilters,
+  getProjectsByFilter,
 } from "./src/data/portfolio";
 import { startSmooth, stopSmooth } from "./src/components/SmoothScroll";
 import SystemCanvas from "./src/components/SystemCanvas";
@@ -92,12 +94,6 @@ const MARQUEE = [
   "AST knowledge graphs",
   "FastAPI",
 ];
-const FILTERS = [
-  { label: "All projects", id: "all", count: "06" },
-  { label: "AI & agents", id: "ai", count: "05" },
-  { label: "Computer vision", id: "vision", count: "01" },
-];
-
 function SectionLabel({ number, children }) {
   return (
     <p className="section-label">
@@ -214,6 +210,7 @@ const ProjectCard = forwardRef(function ProjectCard(
           </a>
         </div>
         <p>{project.summary}</p>
+        {project.scope && <p className="project-scope">{project.scope}</p>}
         <div className="chip-row">
           {project.story.techStack.map((tech) => (
             <span className="chip" key={tech}>
@@ -221,10 +218,23 @@ const ProjectCard = forwardRef(function ProjectCard(
             </span>
           ))}
         </div>
-        <button className="case-link" onClick={() => onOpen(project)}>
-          Explore the project
-          <ArrowUpRight size={16} />
-        </button>
+        <div className="project-actions">
+          <button className="case-link" onClick={() => onOpen(project)}>
+            Explore the project
+            <ArrowUpRight size={16} />
+          </button>
+          {project.demo && (
+            <a
+              className="text-link project-demo"
+              href={project.demo}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Live demo
+              <ArrowUpRight size={16} />
+            </a>
+          )}
+        </div>
       </div>
     </motion.article>
   );
@@ -280,6 +290,9 @@ function CaseStudy({ project, onClose }) {
             <span>.</span>
           </h2>
           <p className="case-tagline">{project.tagline}</p>
+          {project.scope && (
+            <p className="project-scope case-scope">{project.scope}</p>
+          )}
           <ProjectPreview kind={project.id} />
           <div className="case-story">
             <section>
@@ -330,18 +343,31 @@ function CaseStudy({ project, onClose }) {
               </span>
             ))}
           </div>
-          <a
-            className="button button-primary"
-            href={project.github}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Github size={16} />
-            {project.github === links.github
-              ? "Visit GitHub profile"
-              : "Explore the source"}
-            <ArrowUpRight size={16} />
-          </a>
+          <div className="case-actions">
+            <a
+              className="button button-primary"
+              href={project.github}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Github size={16} />
+              {project.github === links.github
+                ? "Visit GitHub profile"
+                : "Explore the source"}
+              <ArrowUpRight size={16} />
+            </a>
+            {project.demo && (
+              <a
+                className="button button-outline"
+                href={project.demo}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Live demo
+                <ArrowUpRight size={16} />
+              </a>
+            )}
+          </div>
         </div>
       )}
     </dialog>
@@ -509,11 +535,7 @@ export default function Portfolio() {
           ["recognition", "Highlights"],
         ]
       : NAV;
-  const visibleProjects = projects.filter(
-    (p) =>
-      filter === "all" ||
-      (filter === "vision" ? p.id === "cottonfield" : p.id !== "cottonfield"),
-  );
+  const visibleProjects = getProjectsByFilter(filter);
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
     document.documentElement.dataset.palette = palette;
@@ -1051,7 +1073,7 @@ export default function Portfolio() {
                 role="group"
                 aria-label="Filter projects"
               >
-                {FILTERS.map((item) => (
+                {projectFilters.map((item) => (
                   <button
                     className={filter === item.id ? "is-selected" : ""}
                     aria-pressed={filter === item.id}
@@ -1059,7 +1081,12 @@ export default function Portfolio() {
                     onClick={() => setFilter(item.id)}
                   >
                     {item.label}
-                    <span>{item.count}</span>
+                    <span>
+                      {String(getProjectsByFilter(item.id).length).padStart(
+                        2,
+                        "0",
+                      )}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -1238,7 +1265,9 @@ export default function Portfolio() {
             </Reveal>
             <div className="milestones">
               {milestones.map((item, i) => {
-                const Icon = [Trophy, Award, Code2][i];
+                const Icon =
+                  { trophy: Trophy, award: Award, code: Code2 }[item.icon] ||
+                  Award;
                 return (
                   <Reveal key={item.org} delay={i * 0.06}>
                     <article className={`milestone milestone-${i}`}>
@@ -1294,7 +1323,13 @@ export default function Portfolio() {
                       <FlaskConical size={18} />
                     </div>
                     <div className="lab-art" aria-hidden="true">
-                      {item.id === "cryptrix" ? (
+                      {item.id === "canopy" ? (
+                        <div className="canopy-context">
+                          <span>Selected context</span>
+                          <Code2 size={48} strokeWidth={1} />
+                          <span>Preview → Review → Save</span>
+                        </div>
+                      ) : item.id === "cryptrix" ? (
                         <>
                           <span className="lab-wave wave-a" />
                           <span className="lab-wave wave-b" />

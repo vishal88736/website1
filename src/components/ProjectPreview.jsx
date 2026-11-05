@@ -13,6 +13,8 @@ import {
   Cpu,
   Users,
   Wallet,
+  Building2,
+  MapPin,
 } from "lucide-react";
 
 const codeLines = [
@@ -45,6 +47,142 @@ export default function ProjectPreview({ kind }) {
   return (
     <div className={`project-preview preview-${kind}`} aria-hidden="true">
       <div className="preview-grid" />
+      {kind === "krono" && (
+        <WindowChrome label="krono / research & paper">
+          <div className="verified-preview-heading">
+            <span>
+              <Activity size={17} />
+              krono
+            </span>
+            <small>PAPER · VIRTUAL FUNDS</small>
+          </div>
+          <div className="krono-research-chart">
+            <span>SOURCE-LABELED RESEARCH</span>
+            <svg viewBox="0 0 400 110" fill="none">
+              <path
+                className="research-grid"
+                d="M0 25H400M0 55H400M0 85H400M80 0V110M200 0V110M320 0V110"
+              />
+              <path
+                className="research-line"
+                d="M0 80L30 65L58 72L86 48L112 56L145 30L172 42L203 26L232 44L263 33L292 57L323 38L356 50L380 29L400 35"
+              />
+            </svg>
+          </div>
+          <div className="verified-preview-rows">
+            {[
+              ["Research", "Source + freshness"],
+              ["Strategy", "Typed intent"],
+              ["Execution", "Risk-gated paper"],
+            ].map(([label, detail]) => (
+              <div key={label}>
+                <span>{label}</span>
+                <span>{detail}</span>
+              </div>
+            ))}
+          </div>
+          <div className="preview-bottom">
+            <span>SEPARATE LEDGERS</span>
+            <span>
+              <ShieldCheck size={11} /> HUMAN CONTROLS
+            </span>
+          </div>
+        </WindowChrome>
+      )}
+      {kind === "urbansaarthi" && (
+        <WindowChrome label="urbansaarthi / civic workspace">
+          <div className="verified-preview-heading">
+            <span>
+              <Building2 size={17} />
+              UrbanSaarthi
+            </span>
+            <small>SYNTHETIC DEMO</small>
+          </div>
+          <div className="civic-preview-layout">
+            <div className="civic-preview-map">
+              <svg viewBox="0 0 180 145" fill="none">
+                <path
+                  className="civic-map-road"
+                  d="M0 66L180 102M60 0L83 145M0 25L180 51M145 0L118 145"
+                />
+                <path d="M14 37L56 44L61 65L18 57Z" />
+                <path d="M74 47L124 53L118 78L80 70Z" />
+                <path d="M26 76L66 86L73 118L32 107Z" />
+                <path d="M91 94L151 107L146 132L94 121Z" />
+              </svg>
+              <span>
+                <MapPin size={12} /> Settlement context
+              </span>
+            </div>
+            <div className="civic-preview-workflows">
+              {[
+                "Housing needs",
+                "Service gaps",
+                "Issue follow-up",
+                "Redevelopment",
+              ].map((label) => (
+                <span key={label}>
+                  <Building2 size={12} />
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="civic-preview-report">
+            <span>Explore → Assess → Follow up → Report</span>
+            <ArrowUpRight size={13} />
+          </div>
+          <div className="preview-bottom">
+            <span>FICTIONAL RECORDS</span>
+            <span>NO GOVERNMENT CONNECTION</span>
+          </div>
+        </WindowChrome>
+      )}
+      {kind === "grace-rul" && (
+        <WindowChrome label="grace-rul / sensor recovery">
+          <div className="verified-preview-heading">
+            <span>
+              <Cpu size={17} />
+              Sensor histories → RUL
+            </span>
+            <small>RESEARCH</small>
+          </div>
+          <div className="sensor-preview-chart">
+            <span>ILLUSTRATIVE SENSOR HISTORY</span>
+            <svg viewBox="0 0 400 130" fill="none">
+              <path className="sensor-grid" d="M0 25H400M0 65H400M0 105H400" />
+              <path
+                className="sensor-reference"
+                d="M0 48L35 42L69 53L104 46L140 57L176 50L210 62L246 58L282 69L317 64L354 77L400 72"
+              />
+              <path
+                className="sensor-corruption"
+                d="M0 48L35 42L69 53L104 46L140 98L176 24L210 109L246 35L282 69L317 64L354 77L400 72"
+              />
+              <path
+                className="sensor-recovery"
+                d="M104 46L140 55L176 52L210 60L246 59L282 69"
+              />
+            </svg>
+            <div>
+              <span>Reference</span>
+              <span>Suspected fault</span>
+              <span>Selective repair</span>
+            </div>
+          </div>
+          <div className="sensor-preview-stages">
+            <span>Detect</span>
+            <span>→</span>
+            <span>Recover</span>
+            <span>→</span>
+            <span>Predict + interval</span>
+          </div>
+          <div className="preview-bottom">
+            <span>NASA C-MAPSS FD001–FD004</span>
+            <span>RESEARCH METHODS</span>
+          </div>
+        </WindowChrome>
+      )}
       {kind === "sanjeevani" && (
         <>
           <span className="preview-orb orb-one" />
@@ -255,18 +393,18 @@ export default function ProjectPreview({ kind }) {
         </WindowChrome>
       )}
       {kind === "finance" && (
-        <WindowChrome label="finance controller / reconciliation">
+        <WindowChrome label="ledgerpilot / financial control">
           <div className="finance-top">
             <span>
-              <Wallet size={17} /> Numbers you can trust.
+              <Wallet size={17} /> LedgerPilot
             </span>
             <ShieldCheck size={16} />
           </div>
           <div className="finance-ledger">
             {[
-              ["Ledger", "Parsed"],
-              ["Bank statement", "Normalized"],
-              ["Payment processor", "Reconciled"],
+              ["Reconciliation", "Deterministic matching"],
+              ["Tax matching", "Eligible evidence"],
+              ["Cash forecasting", "History-based"],
             ].map(([name, state]) => (
               <div key={name}>
                 <span>{name}</span>
@@ -279,12 +417,12 @@ export default function ProjectPreview({ kind }) {
           </div>
           <div className="finance-note">
             <Cpu size={13} />
-            <span>Python computes. AI investigates.</span>
+            <span>Python computes. AI explains.</span>
             <span>↗</span>
           </div>
           <div className="preview-bottom">
-            <span>DECIMAL PRECISION</span>
-            <span>IMMUTABLE AUDIT TRAIL</span>
+            <span>DETERMINISTIC BY DESIGN</span>
+            <span>APPEND-ONLY AUDIT TRAIL</span>
           </div>
         </WindowChrome>
       )}

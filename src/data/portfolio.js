@@ -1,7 +1,215 @@
+export const projectFilters = [
+  { id: "all", label: "All projects" },
+  { id: "ai", label: "AI & agents" },
+  { id: "civic", label: "Civic tech" },
+  { id: "vision", label: "Computer vision" },
+];
+
 export const projects = [
   {
+    id: "krono",
+    filter: "ai",
+    title: "Krono",
+    tagline: "Crypto research and risk-gated HSKSwap paper trading",
+    category: "Agentic Trading",
+    summary:
+      "A crypto research workspace combining source-labeled market and news feeds, conversational strategy controls, and an HSKSwap paper-trading agent. Positions, P&L, and decision history stay traceable through separate persistent ledgers.",
+    scope:
+      "Website automation uses virtual funds. Signed execution tooling is separate; no profitability or signed mainnet deployment is claimed.",
+    story: {
+      problem:
+        "Market research, conversational strategy changes, and execution need a traceable connection without allowing model output to bypass risk checks or human controls.",
+      solution:
+        "Connect a React research terminal to a typed FastAPI boundary, a LangGraph research workflow, and a single-writer AEGIS paper runtime. Source freshness, executable quotes, deterministic risk checks, and reviewed changes govern the path to a virtual fill.",
+      architecture: [
+        {
+          stage: "Research workspace",
+          tech: "React / TypeScript",
+          detail:
+            "Shows source-labeled reference markets, news, strategy research, positions, and recorded decision reports.",
+        },
+        {
+          stage: "Session and conversation API",
+          tech: "FastAPI / LangGraph",
+          detail:
+            "Validates typed requests and session/CSRF boundaries. Conversational tools expose bounded research and strategy controls rather than wallet keys or raw transaction construction.",
+        },
+        {
+          stage: "Market and strategy orchestration",
+          tech: "Python / HSKSwap V3",
+          detail:
+            "Combines verified pool observations and quotes with supported research signals in a single-writer paper runtime; stale or unsupported inputs remain explicit.",
+        },
+        {
+          stage: "Risk-gated paper execution",
+          tech: "Pydantic / Deterministic checks",
+          detail:
+            "Checks quotes, exposure, execution costs, stop conditions, and human-review requirements before a virtual fill. Signed execution runs through a separate gateway.",
+        },
+        {
+          stage: "Persistent audit and accounting",
+          tech: "SQLite",
+          detail:
+            "Records atomic, idempotent paper fills, positions, settings, and decision history. Research and AEGIS accounts remain separate, and paper entries restart paused.",
+        },
+      ],
+      challenge:
+        "Keep research, paper funds, and separately authorized signing distinct while preserving source freshness, deterministic financial calculations, bounded conversational controls, and auditable accounting.",
+      results: [
+        "Source-labeled research and recorded decision reports",
+        "Risk-gated paper execution using virtual funds",
+        "Separate research and AEGIS accounting ledgers",
+      ],
+      techStack: [
+        "React",
+        "TypeScript",
+        "Python",
+        "FastAPI",
+        "SQLite",
+        "LangGraph",
+        "HSKSwap V3",
+      ],
+    },
+    github: "https://github.com/vishal88736/automatic-trading-agent",
+  },
+  {
+    id: "urbansaarthi",
+    filter: "civic",
+    title: "NagarSeva First / UrbanSaarthi",
+    tagline: "People, places, and connected civic follow-up",
+    category: "Civic Tech",
+    summary:
+      "A civic-tech prototype for settlement exploration, affordable-housing assessment, basic-service gap tracking, citizen issue reporting, redevelopment monitoring, maps, and reports. Its demonstration workspace uses synthetic records, not official government integrations.",
+    scope:
+      "Settlements, map geometry, service indicators, issues, and redevelopment records are fictional demonstration data. No authorized external government service is connected.",
+    story: {
+      problem:
+        "Housing assessments, basic-service needs, citizen complaints, and redevelopment progress need to remain connected to the same settlement context as teams record and review follow-up.",
+      solution:
+        "Use a shared server-backed demonstration workspace to explore settlements, assess housing needs, inspect service gaps, report issues, track redevelopment milestones, and export reports. The interface supports English, Hindi, and Marathi, with persistent synthetic-data labeling.",
+      architecture: [
+        {
+          stage: "Civic workspace",
+          tech: "React / TypeScript / Vite",
+          detail:
+            "Typed civic services and an adapter connect the dashboard, settlement explorer, housing assessments, issues, services, redevelopment, and reports to the same workspace.",
+        },
+        {
+          stage: "Mapping and exploration",
+          tech: "Leaflet / react-leaflet",
+          detail:
+            "Displays synthetic settlement polygons with synchronized selection, layer controls, and pan/zoom. Optional OpenStreetMap tiles provide context; a fallback handles an unavailable basemap.",
+        },
+        {
+          stage: "Validated civic operations",
+          tech: "FastAPI / Pydantic",
+          detail:
+            "Validates issue submissions, housing assessments, service findings, project milestones, and report requests. Operational changes retain follow-up notes and history.",
+        },
+        {
+          stage: "Shared persistence",
+          tech: "SQLite",
+          detail:
+            "Stores the demonstration workspace transactionally with revision checks and idempotent operations. File-onboarding batches are isolated from the active synthetic city.",
+        },
+        {
+          stage: "Hosted demonstration",
+          tech: "Docker / EC2 / CloudFront",
+          detail:
+            "Runs the containerized application on EC2 behind a CloudFront public origin serving both the website and API.",
+        },
+      ],
+      challenge:
+        "Maintain consistent settlement context and confirmed state across maps, assessments, issues, and project updates while keeping synthetic examples clearly separate from official records and proposed public-service outcomes.",
+      results: [
+        "Connected settlement, housing, service, and issue workflows",
+        "Redevelopment follow-up with report and CSV export",
+        "Documented public demonstration using synthetic data",
+      ],
+      techStack: [
+        "React",
+        "TypeScript",
+        "FastAPI",
+        "SQLite",
+        "Leaflet",
+        "Docker",
+        "EC2",
+        "CloudFront",
+      ],
+    },
+    github: "https://github.com/vishal88736/nagarseva-seva-first",
+    demo: "https://d2nrwxy6sjb9o8.cloudfront.net/",
+  },
+  {
+    id: "grace-rul",
+    filter: "ai",
+    title: "CMAPSS Predictive Maintenance / GRACE-RUL",
+    tagline: "From damaged sensor histories to remaining useful life",
+    category: "Predictive Maintenance",
+    summary:
+      "A research pipeline on NASA C-MAPSS FD001–FD004 combining operating-condition preprocessing, detection of synthetically corrupted sensor readings, selective sensor recovery, remaining useful life prediction, and calibrated uncertainty estimates.",
+    scope:
+      "NASA simulation benchmarks with additional synthetic sensor faults. This describes the implemented research methods; no unverified accuracy, improvement, or completed experiment is claimed.",
+    story: {
+      problem:
+        "Missing, drifting, stuck, or jointly noisy sensor readings can distort degradation histories. Remaining useful life estimates need to account for both operating conditions and input quality without using future engine observations.",
+      solution:
+        "Share a PyTorch implementation between the training workflow and application. Fit preprocessing on fitting engines, simulate structured correlated faults, estimate damaged readings, selectively recover signals, and combine local and longer-history predictors with separately calibrated intervals.",
+      architecture: [
+        {
+          stage: "Engine histories and preprocessing",
+          tech: "NASA C-MAPSS / pandas / scikit-learn",
+          detail:
+            "Uses FD001–FD004 engine trajectories, sensor channels, and operating settings. Engine-disjoint fitting and operating-regime normalization keep preprocessing statistics separate from held-out engines.",
+        },
+        {
+          stage: "Structured faults and detection",
+          tech: "Synthetic corruption / CNN–GRU detector",
+          detail:
+            "The simulator creates domain-related dropouts, correlated temporal noise, bias, drift, and stuck readings. A convolutional/GRU detector estimates per-reading fault scores using observations, availability, and settings.",
+        },
+        {
+          stage: "Selective sensor recovery",
+          tech: "BiLSTM / WGAN-GP training",
+          detail:
+            "A bidirectional LSTM generator proposes sensor corrections. Availability masks, estimated faults, validation-selected gates, and fitted-support bounds control selective repair; a temporal critic supplies adversarial training feedback.",
+        },
+        {
+          stage: "Remaining useful life prediction",
+          tech: "CNN–GRU / Transformer / PyTorch",
+          detail:
+            "Quality-aware fusion combines a local convolutional/GRU branch and a longer-history Transformer branch. A bounded residual corrector uses observable features and engine-disjoint out-of-fold training predictions.",
+        },
+        {
+          stage: "Uncertainty calibration",
+          tech: "Engine-disjoint split conformal",
+          detail:
+            "Independent calibration engines determine prediction-interval bounds after model selection. The documented interval contracts distinguish capped and raw RUL targets and depend on their stated exchangeability assumptions.",
+        },
+      ],
+      challenge:
+        "Separate fitting, model selection, calibration, and evaluation by engine while protecting intact measurements during recovery and keeping synthetic-fault behavior distinct from measured predictive accuracy.",
+      results: [
+        "Operating-condition-aware preprocessing across FD001–FD004",
+        "Implemented fault detection and selective recovery pipeline",
+        "RUL prediction with independently calibrated intervals",
+      ],
+      techStack: [
+        "Python",
+        "PyTorch",
+        "pandas",
+        "NumPy",
+        "scikit-learn",
+        "CNN–GRU",
+        "BiLSTM",
+        "Transformer",
+      ],
+    },
+    github: "https://github.com/vishal88736/cmapss-predictive-maintenance",
+  },
+  {
     id: "sanjeevani",
-    number: "01",
+    filter: "ai",
     title: "Sanjeevani",
     tagline: "Multilingual Voice-First Healthcare AI Triage",
     category: "Healthcare AI",
@@ -64,7 +272,7 @@ export const projects = [
   },
   {
     id: "codrix",
-    number: "02",
+    filter: "ai",
     title: "Codrix.AI",
     tagline: "Codebase Intelligence & AST Knowledge Graph",
     category: "Code Intelligence",
@@ -125,7 +333,7 @@ export const projects = [
   },
   {
     id: "careertrajectory",
-    number: "03",
+    filter: "ai",
     title: "CareerTrajectory AI",
     tagline: "Redefining Talent Intelligence Beyond Traditional ATS",
     category: "Talent Intelligence",
@@ -192,7 +400,7 @@ export const projects = [
   },
   {
     id: "cottonfield",
-    number: "04",
+    filter: "vision",
     title: "Cotton Field Analysis",
     tagline:
       "AI-Powered Crop Intelligence from High-Resolution Orthomosaic Imagery",
@@ -258,7 +466,7 @@ export const projects = [
   },
   {
     id: "alpaca",
-    number: "05",
+    filter: "ai",
     title: "Alpaca Trading Agentic AI",
     tagline: "Signal/Terminal — Autonomous AI Trading on Alpaca Paper Trading",
     category: "Agentic Trading",
@@ -321,68 +529,96 @@ export const projects = [
   },
   {
     id: "finance",
-    number: "06",
-    title: "Razorpay Finance Controller",
-    tagline: "AI Finance Controller — Deterministic Truth, Agentic Investigation",
-    category: "AI Finance",
+    filter: "ai",
+    title: "LedgerPilot",
+    tagline: "AI-assisted. Auditor-ready.",
+    category: "Agentic AI / Financial Technology",
     summary:
-      "A financial operations workspace where pure Python handles parsing, Decimal normalization, matching, and scoring, while LangGraph agents handle routing, reasoning, and investigation with threads and an audit trail.",
+      "An AI-assisted financial operations platform for reconciliation, discrepancy investigation, tax-related transaction analysis, cash-flow forecasting, and evidence-grounded insights. Deterministic Python handles financial calculations and matching; LangGraph workflows route investigations and explain structured results.",
+    scope: "Functional demonstration and continued development.",
     story: {
       problem:
-        "Financial reconciliation needs exact arithmetic and traceable evidence, not fluent estimates — while still supporting natural-language investigation.",
+        "Finance teams work with fragmented bank, payment-processor, and internal-ledger records. Manual reconciliation is time-consuming and difficult to audit, while assigning financial calculations or matching decisions directly to language models risks fabricated figures, inconsistent results, and irreproducible decisions.",
       solution:
-        "A thread-scoped workspace with a deterministic Pandas reconciliation engine for netting, tolerance, and duplicate checks, fronted by a LangGraph router for intent routing, summarization, and guardrailed Q&A.",
+        "Combine deterministic financial processing with agentic investigation in one workspace. Multi-pass reconciliation uses identifiers, references, amounts, dates, and entity information. Duplicate, unmatched, ambiguous, and fee-related exceptions retain their evidence. LangGraph routes queries and explains verified results; historical-data-based forecasts explicitly handle insufficient information, and tax matching evaluates eligible evidence with rules.",
       architecture: [
         {
-          stage: "Thread Workspace",
-          tech: "Thread Isolation",
+          stage: "Financial document intake",
+          tech: "FastAPI / Schema detection",
           detail:
-            "Every conversation runs in an isolated thread_id with its own document registry and results store.",
+            "Register documents within an analysis thread, detect their schemas, and map source columns into the financial processing workflow while retaining provenance.",
         },
         {
-          stage: "Duplicate Checks",
-          tech: "SHA-256 + Fingerprint",
+          stage: "Deterministic reconciliation",
+          tech: "Python / Pandas / NumPy",
           detail:
-            "Level 1 detects exact file duplicates by bytes; Level 2 detects logical duplicates by canonical records.",
+            "Normalize and validate records, then apply multi-pass matching using identifiers, references, amounts, dates, and entity information. Tolerance checks and duplicate detection remain outside the language model.",
         },
         {
-          stage: "Reconciliation",
-          tech: "Pandas Engine",
+          stage: "Structured results and exceptions",
+          tech: "Deterministic financial services",
           detail:
-            "Deterministic engine nets fees, refunds, and chargebacks with Decimal precision and explicit FX handling.",
+            "Produce reproducible matches and structured discrepancy reports for unmatched transactions, ambiguous candidates, fees, and inconsistent records, with related source-record evidence.",
         },
         {
-          stage: "Agentic Router",
+          stage: "Financial investigation",
           tech: "LangGraph",
           detail:
-            "Routes reconciliation, exception, and Q&A intents with layered guardrails for scope and permissions.",
+            "Route queries, investigate exceptions, and provide evidence-grounded financial Q&A using structured results. Language models explain financial evidence; they do not calculate authoritative totals or decide transaction matches.",
         },
         {
-          stage: "Audit Trail",
-          tech: "SQLite / Trace",
+          stage: "Forecasting and tax matching",
+          tech: "Python / Rule-based analysis",
           detail:
-            "Records every action, tool call, and outcome in an append-only log for review and replay.",
+            "Build cash-flow projections from historical information with explicit insufficient-data handling. Evaluate tax-related records only when the required eligible evidence is available.",
+        },
+        {
+          stage: "Persistent audit and analysis history",
+          tech: "SQLAlchemy / SQLite",
+          detail:
+            "Preserve documents, reconciliation results, exceptions, and analysis history by thread. Append-only processing events and provenance support later review.",
+        },
+        {
+          stage: "Financial control dashboard",
+          tech: "Next.js / React / TypeScript",
+          detail:
+            "Provide access to analyses, documents, reconciliation results, forecasts, tax matching, exceptions, and audit history from a unified dashboard.",
         },
       ],
       challenge:
-        "Truth Separation: Keeping all figures, matches, and metrics in deterministic Python so the LLM never becomes the source of financial truth.",
+        "Separate AI reasoning from financial truth so language models never own authoritative calculations or transaction matches. Make reconciliation reliable through multiple matching passes, tolerance checks, duplicate detection, and explicit ambiguity handling. Preserve thread-based documents, results, exceptions, and processing history so investigations remain traceable.",
       results: [
-        "Deterministic Python for All Calculations",
-        "Guardrailed Routing and Investigation",
-        "Immutable Audit Trail per Thread",
+        "Reproducible, deterministic financial reconciliation",
+        "Evidence-grounded financial Q&A",
+        "Structured discrepancy and exception reporting",
+        "Persistent, auditable analysis workflows",
+        "Integrated reconciliation, forecasting, and tax analysis",
       ],
       techStack: [
         "Python",
         "FastAPI",
         "LangGraph",
         "Pandas",
+        "NumPy",
+        "SQLAlchemy",
         "SQLite",
         "Next.js",
+        "React",
+        "TypeScript",
       ],
     },
     github: "https://github.com/vishal88736/finance-controller",
   },
-];
+].map((project, index) => ({
+  ...project,
+  number: String(index + 1).padStart(2, "0"),
+}));
+
+export function getProjectsByFilter(filter = "all") {
+  return projects.filter(
+    (project) => filter === "all" || project.filter === filter,
+  );
+}
 
 export const expertise = [
   {
@@ -427,6 +663,14 @@ export const expertise = [
 
 export const upcoming = [
   {
+    id: "canopy",
+    title: "Canopy",
+    subtitle: "Context-first AI coding workspace",
+    status: "BUILDING",
+    desc: "A local AI coding workspace in active development. Each conversation has its own selectable context, request previews make model inputs inspectable, and proposed file changes can be reviewed before saving.",
+    tech: ["React", "TypeScript", "Express", "SQLite"],
+  },
+  {
     id: "cryptrix",
     title: "Cryptrix",
     subtitle: "AI Trading Intelligence Platform",
@@ -446,19 +690,36 @@ export const upcoming = [
 
 export const milestones = [
   {
+    org: "AssemblyAI Voice Agent Hackathon",
+    role: "1st Place — Best Solution",
+    period: "Global event",
+    icon: "trophy",
+    desc: "Won 1st Place (Best Solution) at the global AssemblyAI Voice Agent Hackathon organized by lablab.ai / AssemblyAI, with 4,100+ registered builders. WorkerSaathi is a bilingual, voice-first AI assistant designed to make labor-related legal guidance more accessible to India’s informal and daily-wage workers. It combines AssemblyAI real-time speech integration with Hindi and English voice interaction, contextual AI-based legal reasoning, structured grievance summaries, and action-oriented resolution workflows.",
+  },
+  {
+    org: "Multimodal AI Hackathon 2026 · IIT Mandi",
+    role: "Rank 8 — Track B",
+    period: "2026",
+    icon: "award",
+    desc: "Secured Rank 8 in Track B at the Multimodal AI Hackathon 2026 organized by KamandPrompt, IIT Mandi. The event involved 4,300 participants across the competition, building and experimenting with multimodal AI solutions under hackathon constraints.",
+  },
+  {
     org: "AI Durg & Gemma 4 Hackathon",
+    icon: "trophy",
     role: "Hackathon Winner - Sanjeevani AI",
     period: "2026",
     desc: "Won 1st Place in the hackathon organized by AI Durg & Gemma 4 by engineering 'Sanjeevani' - a multilingual voice-first healthcare triage assistant powered by Gemma LLM.",
   },
   {
     org: "AWS National Level Hackathon",
+    icon: "award",
     role: "Prototype Stage Qualifier",
     period: "2026",
     desc: "Qualified the prototype level in the AWS National Level Hackathon, gaining deep hands-on expertise in AWS Cloud services, scalable infrastructure, and AI deployment.",
   },
   {
     org: "Competitive Programming",
+    icon: "code",
     role: "CodeChef 2-star - 200+ Problems Solved Across Platforms",
     period: "Ongoing",
     desc: "Achieved CodeChef 2-star rating and solved 200+ algorithmic problems across all competitive coding platforms, mastering graph theory, dynamic programming, and core data structures.",

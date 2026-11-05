@@ -4,6 +4,13 @@ import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
 import react from "@vitejs/plugin-react";
 import { createServer } from "vite";
+import {
+  projects,
+  upcoming,
+  milestones,
+  projectFilters,
+  getProjectsByFilter,
+} from "../src/data/portfolio.js";
 
 // These are DOM interaction checks, not browser rendering or layout tests.
 const dom = new JSDOM(
@@ -137,7 +144,10 @@ test("switches to a complete recruiter overview and maintains a shareable URL", 
   assert.equal(window.location.search, "?ref=review&view=recruiter");
   assert.equal(window.location.hash, "");
   assert.equal(button("Recruiter").getAttribute("aria-pressed"), "true");
-  assert.equal(document.querySelectorAll(".recruiter-project").length, 6);
+  assert.equal(
+    document.querySelectorAll(".recruiter-project").length,
+    projects.length,
+  );
   assert.equal(document.querySelectorAll(".recruiter-skill-group").length, 6);
   assert.ok(
     document.querySelector(
@@ -166,7 +176,10 @@ test("loads recruiter deep links and responds to history navigation", async () =
 
 test("opens and dismisses case studies in both views without retaining scroll lock", async () => {
   await mount("/?view=recruiter");
-  await click(button("Case study"));
+  const existingProject = [
+    ...document.querySelectorAll(".recruiter-project"),
+  ].find((card) => card.querySelector("h3").textContent === "Sanjeevani");
+  await click(button("Case study", existingProject));
   assert.equal(document.querySelector("dialog").open, true);
   assert.equal(
     document.querySelector("#case-title").textContent,
@@ -229,9 +242,12 @@ test("project filters show the intended projects and restore the complete galler
   await waitForCount(".project-card", 1);
   assert.match(document.querySelector(".project-card").textContent, /Cotton/i);
   await click(button("AI & agents"));
-  await waitForCount(".project-card", 5);
+  await waitForCount(".project-card", getProjectsByFilter("ai").length);
   await click(button("All projects"));
-  assert.equal(document.querySelectorAll(".project-card").length, 6);
+  assert.equal(
+    document.querySelectorAll(".project-card").length,
+    projects.length,
+  );
 });
 
 test("theme and palette selection remain usable when changing views", async () => {
@@ -414,4 +430,227 @@ test("Recruiter releases Explore's scroller and returning to Explore restores it
     document.documentElement.classList.contains("lenis-stopped"),
     false,
   );
+});
+
+test("project and development data preserve the requested order and derive numbering and filters", () => {
+  assert.deepEqual(
+    projects.map((project) => project.id),
+    [
+      "krono",
+      "urbansaarthi",
+      "grace-rul",
+      "sanjeevani",
+      "codrix",
+      "careertrajectory",
+      "cottonfield",
+      "alpaca",
+      "finance",
+    ],
+  );
+  assert.deepEqual(
+    upcoming.map((project) => project.id),
+    ["canopy", "cryptrix", "novatune"],
+  );
+  assert.equal(
+    new Set(projects.map((project) => project.id)).size,
+    projects.length,
+  );
+  for (const [index, project] of projects.entries()) {
+    assert.equal(project.number, String(index + 1).padStart(2, "0"));
+    assert.ok(projectFilters.some((filter) => filter.id === project.filter));
+    assert.ok(project.story.architecture.length > 0);
+    assert.ok(project.story.techStack.length > 0);
+  }
+  const ledgerPilot = projects.find((project) => project.id === "finance");
+  assert.equal(ledgerPilot.title, "LedgerPilot");
+  assert.equal(ledgerPilot.tagline, "AI-assisted. Auditor-ready.");
+  assert.equal(
+    ledgerPilot.scope,
+    "Functional demonstration and continued development.",
+  );
+  assert.equal(
+    projects.filter((project) => project.github === ledgerPilot.github).length,
+    1,
+    "LedgerPilot keeps the existing source entry without duplication",
+  );
+  assert.ok(ledgerPilot.story.techStack.includes("SQLAlchemy"));
+  assert.ok(ledgerPilot.story.techStack.includes("NumPy"));
+  assert.equal(getProjectsByFilter("all").length, projects.length);
+  assert.deepEqual(
+    getProjectsByFilter("civic").map((project) => project.id),
+    ["urbansaarthi"],
+  );
+  assert.deepEqual(
+    getProjectsByFilter("vision").map((project) => project.id),
+    ["cottonfield"],
+  );
+  assert.match(projects[1].summary, /synthetic.*not official government/i);
+  assert.match(projects[2].scope, /no unverified accuracy/i);
+  assert.equal(
+    projects.some((project) => /canopy|workersaathi/i.test(project.title)),
+    false,
+  );
+});
+
+test("Explore renders the new previews and keeps every filter count in sync with its results", async () => {
+  await mount();
+  assert.deepEqual(
+    [...document.querySelectorAll(".project-card h3")].map(
+      (node) => node.textContent,
+    ),
+    projects.map((project) => project.title),
+  );
+  for (const project of [
+    ...projects.slice(0, 3),
+    projects.find((project) => project.id === "finance"),
+  ]) {
+    const preview = document.querySelector(`.preview-${project.id}`);
+    assert.ok(
+      preview.querySelector(".preview-window"),
+      `${project.title} has a dedicated preview`,
+    );
+    assert.match(preview.textContent, /INTERFACE CONCEPT/);
+  }
+  assert.ok(
+    document.querySelector(
+      '.project-card a[href="https://d2nrwxy6sjb9o8.cloudfront.net/"]',
+    ),
+  );
+  for (const filter of projectFilters) {
+    const control = button(
+      filter.label,
+      document.querySelector(".project-filters"),
+    );
+    const expected = getProjectsByFilter(filter.id);
+    assert.equal(
+      control.querySelector("span").textContent,
+      String(expected.length).padStart(2, "0"),
+    );
+    await click(control);
+    await waitForCount(".project-card", expected.length);
+    assert.deepEqual(
+      [...document.querySelectorAll(".project-card h3")].map(
+        (node) => node.textContent,
+      ),
+      expected.map((project) => project.title),
+    );
+    assert.match(
+      document.querySelector(".work-count").textContent,
+      new RegExp(`${String(expected.length).padStart(2, "0")} PROJECTS`),
+    );
+  }
+});
+
+test("new case studies and verified source/demo links work in Explore and Recruiter", async () => {
+  await mount();
+  for (const view of ["Explore", "Recruiter"]) {
+    await click(button(view));
+    for (const project of [
+      ...projects.slice(0, 3),
+      projects.find((project) => project.id === "finance"),
+    ]) {
+      if (view === "Explore")
+        await click(
+          document.querySelector(
+            `[aria-label="Open ${project.title} case study"]`,
+          ),
+        );
+      else {
+        const card = [...document.querySelectorAll(".recruiter-project")].find(
+          (node) => node.querySelector("h3").textContent === project.title,
+        );
+        assert.match(
+          card.textContent,
+          new RegExp(project.scope.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+        );
+        await click(button("Case study", card));
+      }
+      const dialog = document.querySelector("dialog");
+      assert.equal(dialog.open, true);
+      assert.equal(
+        dialog.querySelector("#case-title").textContent,
+        `${project.title}.`,
+      );
+      assert.equal(
+        dialog.querySelectorAll(".architecture-step").length,
+        project.story.architecture.length,
+      );
+      assert.equal(
+        dialog.querySelector(".case-scope").textContent,
+        project.scope,
+      );
+      assert.ok(
+        [...dialog.querySelectorAll("a")].some(
+          (link) => link.href === project.github,
+        ),
+      );
+      const demo = [...dialog.querySelectorAll("a")].find((link) =>
+        link.textContent.includes("Live demo"),
+      );
+      assert.equal(demo?.href, project.demo);
+      await click(dialog.querySelector('[aria-label="Close case study"]'));
+      assert.equal(dialog.open, false);
+    }
+    if (view === "Recruiter") {
+      assert.deepEqual(
+        [...document.querySelectorAll(".recruiter-project h3")].map(
+          (node) => node.textContent,
+        ),
+        projects.map((project) => project.title),
+      );
+      assert.equal(
+        document.querySelectorAll(".recruiter-page [style]").length,
+        0,
+      );
+    }
+  }
+});
+
+test("both views show the new achievements first and Canopy only in the building list", async () => {
+  await mount();
+  for (const view of ["Explore", "Recruiter"]) {
+    await click(button(view));
+    const recognition =
+      view === "Explore"
+        ? [...document.querySelectorAll(".milestone")]
+        : [...document.querySelectorAll(".recruiter-timeline article")];
+    assert.deepEqual(
+      recognition.map((node) => node.querySelector("h3").textContent),
+      milestones.map((item) => item.org),
+    );
+    assert.match(recognition[0].textContent, /1st Place.*Best Solution/);
+    assert.match(recognition[0].textContent, /4,100\+ registered builders/);
+    assert.match(
+      recognition[0].textContent,
+      /WorkerSaathi.*AssemblyAI real-time speech.*Hindi and English.*legal reasoning.*grievance summaries.*resolution workflows/s,
+    );
+    assert.match(recognition[1].textContent, /Rank 8.*Track B/);
+    assert.match(recognition[1].textContent, /KamandPrompt.*IIT Mandi/);
+    assert.match(recognition[1].textContent, /4,300 participants across/);
+    assert.doesNotMatch(
+      recognition
+        .slice(0, 2)
+        .map((node) => node.textContent)
+        .join(" "),
+      /Gireesh|Aaditya|Meghrajani|Mishra/,
+    );
+    const building =
+      view === "Explore"
+        ? [...document.querySelectorAll(".lab-card")]
+        : [...document.querySelectorAll(".recruiter-building-item")];
+    assert.deepEqual(
+      building.map((node) => node.querySelector("h3").textContent.trim()),
+      upcoming.map((item) => item.title),
+    );
+    assert.match(building[0].textContent, /BUILDING/);
+    const completed = [
+      ...document.querySelectorAll(
+        view === "Explore" ? ".project-card h3" : ".recruiter-project h3",
+      ),
+    ]
+      .map((node) => node.textContent)
+      .join(" ");
+    assert.doesNotMatch(completed, /Canopy|WorkerSaathi/);
+    checkAnchorTargets();
+  }
 });
