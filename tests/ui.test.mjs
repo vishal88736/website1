@@ -137,7 +137,7 @@ test("switches to a complete recruiter overview and maintains a shareable URL", 
   assert.equal(window.location.search, "?ref=review&view=recruiter");
   assert.equal(window.location.hash, "");
   assert.equal(button("Recruiter").getAttribute("aria-pressed"), "true");
-  assert.equal(document.querySelectorAll(".recruiter-project").length, 6);
+  assert.equal(document.querySelectorAll(".recruiter-project").length, 10);
   assert.equal(document.querySelectorAll(".recruiter-skill-group").length, 6);
   assert.ok(
     document.querySelector(
@@ -228,10 +228,10 @@ test("project filters show the intended projects and restore the complete galler
   await click(button("Computer vision"));
   await waitForCount(".project-card", 1);
   assert.match(document.querySelector(".project-card").textContent, /Cotton/i);
-  await click(button("AI & agents"));
+  await click(button("AI & systems"));
   await waitForCount(".project-card", 5);
   await click(button("All projects"));
-  assert.equal(document.querySelectorAll(".project-card").length, 6);
+  assert.equal(document.querySelectorAll(".project-card").length, 10);
 });
 
 test("theme and palette selection remain usable when changing views", async () => {

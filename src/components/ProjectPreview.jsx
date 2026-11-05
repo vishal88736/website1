@@ -288,6 +288,20 @@ export default function ProjectPreview({ kind }) {
           </div>
         </WindowChrome>
       )}
+      {["canopy", "krono", "nagarseva", "cmapss"].includes(kind) && (
+        <WindowChrome label={kind === "canopy" ? "canopy / project" : kind === "krono" ? "krono / project" : kind === "nagarseva" ? "urbansaarthi / civic workspace" : "grace-rul / engine health"}>
+          <div className="code-title">
+            {kind === "nagarseva" ? <Users size={18} /> : kind === "cmapss" ? <Activity size={18} /> : <Code2 size={18} />}
+            <span>{kind === "nagarseva" ? "Places. People. Better cities." : kind === "cmapss" ? "Distinguish sensor faults from degradation." : "Case study in preparation"}</span>
+          </div>
+          <div className="finance-ledger">
+            {(kind === "nagarseva" ? [["Settlements", "Explore"], ["Service gaps", "Track"], ["Redevelopment", "Follow up"]] : kind === "cmapss" ? [["Sensors", "Monitor"], ["Faults", "Detect"], ["RUL", "Estimate"]] : [["Overview", "Pending"], ["Technical details", "Pending"], ["Results", "Pending"]]).map(([name, state]) => (
+              <div key={name}><span>{name}</span><span>{state}</span></div>
+            ))}
+          </div>
+          <div className="preview-bottom"><span>{kind === "nagarseva" ? "CIVIC WORKSPACE" : kind === "cmapss" ? "FAULT-AWARE PREDICTION" : "PROJECT DETAILS PENDING"}</span></div>
+        </WindowChrome>
+      )}
       <span className="preview-concept">INTERFACE CONCEPT</span>
     </div>
   );

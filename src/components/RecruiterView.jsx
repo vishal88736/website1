@@ -136,20 +136,21 @@ export default function RecruiterView({ onOpenProject, menuOpen }) {
                     ))}
                   </div>
                   <div className="recruiter-project-links">
-                    <button
+                    {!project.draft && <button
                       type="button"
                       onClick={() => onOpenProject(project)}
                     >
                       Case study
                       <ArrowUpRight size={13} />
-                    </button>
-                    <a href={project.github} target="_blank" rel="noreferrer">
+                    </button>}
+                    {!project.draft && <a href={project.github} target="_blank" rel="noreferrer">
                       <Github size={13} />
                       {project.github === links.github
                         ? "GitHub profile"
                         : "Source"}
                       <ArrowUpRight size={12} />
-                    </a>
+                    </a>}
+                    {project.draft && <span>Details forthcoming</span>}
                   </div>
                 </article>
               ))}
